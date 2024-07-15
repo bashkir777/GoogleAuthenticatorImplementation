@@ -11,4 +11,5 @@ spring:
       ddl-auto: create-drop
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-
+JWTAuthService:
+  secret-key: 7dec524d50d2b1ec883f422e015659b1e57e42305e84c3cabb6d70911de2bc24
