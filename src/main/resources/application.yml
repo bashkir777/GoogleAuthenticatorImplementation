@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: JWTAuthService
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jwtauthserver
+    password: THsF*3858
+    username: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
