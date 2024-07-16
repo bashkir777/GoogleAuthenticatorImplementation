@@ -3,7 +3,7 @@ package com.bashkir777.jwtauthservice.auth.controllers;
 import com.bashkir777.jwtauthservice.auth.dto.AuthenticationRequest;
 import com.bashkir777.jwtauthservice.auth.dto.AuthenticationResponse;
 import com.bashkir777.jwtauthservice.auth.dto.RegisterRequest;
-import com.bashkir777.jwtauthservice.security.services.AuthenticationService;
+import com.bashkir777.jwtauthservice.auth.security.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,9 +23,9 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.register(registerRequest));
     }
 
-    @PostMapping("/authenticate")
+    @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest registerRequest){
-        return ResponseEntity.ok(authenticationService.authenticate(registerRequest));
+        return ResponseEntity.ok(authenticationService.login(registerRequest));
     }
 
 }

@@ -26,6 +26,9 @@ public class User implements UserDetails {
     private String firstName;
     private String lastName;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private RefreshToken token;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 

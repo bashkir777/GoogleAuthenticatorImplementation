@@ -1,6 +1,8 @@
-package com.bashkir777.jwtauthservice.security.filters;
+package com.bashkir777.jwtauthservice.auth.security.filters;
 
-import com.bashkir777.jwtauthservice.security.services.JwtService;
+import com.bashkir777.jwtauthservice.auth.security.services.JwtService;
+import com.bashkir777.jwtauthservice.data.enums.TokenType;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,9 +21,10 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request
@@ -30,25 +33,49 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
-        if(authHeader == null || !authHeader.startsWith("BEARER ")){
+        if (authHeader == null || !authHeader.startsWith("BEARER ")) {
+            // Access token is absent or not in the correct format
+            // go user+password authentication
             filterChain.doFilter(request, response);
             return;
         }
 
         String jwt = authHeader.split(" ")[1];
 
-        String username = jwtService.extractUsername(jwt);
-        if(username != null && SecurityContextHolder.getContext().getAuthentication() != null){
-            UserDetails user = userDetailsService.loadUserByUsername(username);
-            if(jwtService.isTokenValid(jwt, user)){
+        //if token is expired or forged send Error
+        Claims claims;
+        try{
+            claims = jwtService.extractAllClaimsAndValidateToken(jwt);
+        }catch (RuntimeException invalidToken){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write(invalidToken.getMessage());
+            response.getWriter().flush();
+            return;
+        }
+
+
+        String username = jwtService.extractUsername(claims);
+        TokenType type = jwtService.parseTokenType(claims);
+
+        if (type.equals(TokenType.REFRESH)) {
+            if (username != null) {
+                UserDetails user = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
+                authToken.setAuthenticated(true);
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+        }else{
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("refresh token cant be used as an access token");
+            response.getWriter().flush();
+            return;
         }
+
         filterChain.doFilter(request, response);
     }
 }

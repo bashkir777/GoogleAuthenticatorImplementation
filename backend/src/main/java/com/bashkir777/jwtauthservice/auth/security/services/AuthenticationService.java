@@ -1,4 +1,4 @@
-package com.bashkir777.jwtauthservice.security.services;
+package com.bashkir777.jwtauthservice.auth.security.services;
 
 import com.bashkir777.jwtauthservice.auth.dto.AuthenticationRequest;
 import com.bashkir777.jwtauthservice.auth.dto.AuthenticationResponse;
@@ -6,6 +6,7 @@ import com.bashkir777.jwtauthservice.auth.dto.RegisterRequest;
 import com.bashkir777.jwtauthservice.data.UserRepository;
 import com.bashkir777.jwtauthservice.data.entities.User;
 import com.bashkir777.jwtauthservice.data.enums.Role;
+import com.bashkir777.jwtauthservice.data.enums.TokenType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +22,12 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    private AuthenticationResponse generateTokenPair(User user) {
+        var accessToken = jwtService.generateToken(user, TokenType.ACCESS, null);
+        var refreshToken = jwtService.generateToken(user, TokenType.REFRESH, null);
+        return AuthenticationResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+    }
+
     public AuthenticationResponse register(RegisterRequest registerRequest) {
         var user = User.builder().firstName(registerRequest.getFirstname())
                 .lastName(registerRequest.getLastname())
@@ -28,17 +35,16 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .role(Role.USER).build();
         userRepository.save(user);
-        var token = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(token).build();
+        return generateTokenPair(user);
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest registerRequest) {
+    public AuthenticationResponse login(AuthenticationRequest registerRequest) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 registerRequest.getUsername(), registerRequest.getPassword()
         ));
         var user = userRepository
                 .getUserByUsername(registerRequest.getUsername());
-        String token = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(token).build();
+        return generateTokenPair(user);
     }
+
 }

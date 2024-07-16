@@ -1,7 +1,6 @@
-package com.bashkir777.jwtauthservice.security.config;
+package com.bashkir777.jwtauthservice.auth.security.config;
 
-import com.bashkir777.jwtauthservice.security.filters.JwtAuthenticationFilter;
-import jakarta.servlet.http.HttpSession;
+import com.bashkir777.jwtauthservice.auth.security.filters.JwtAccessAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,18 +17,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
-    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final JwtAccessAuthenticationFilter jwtAccessAuthenticationFilter;
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, HttpSession httpSession) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests
                         -> authorizeRequests.requestMatchers("/api/v1/auth/**")
                         .permitAll().anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAccessAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
