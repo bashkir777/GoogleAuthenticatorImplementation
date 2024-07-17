@@ -78,7 +78,7 @@ public class AuthenticationService {
         return authenticationResponse;
     }
 
-    public AccessToken refresh(@NonNull RefreshTokenDTO refreshTokenDTO) throws InvalidTokenException {
+    private User checkIfTokenIsValidAndRefreshTypeAndReturnUser(RefreshTokenDTO refreshTokenDTO) throws InvalidTokenException{
         String username;
         TokenType type;
         try {
@@ -92,15 +92,24 @@ public class AuthenticationService {
         if (user == null || !type.equals(TokenType.REFRESH)) {
             throw new InvalidTokenException();
         }
+        return user;
+    }
+
+    public void logout(@NonNull RefreshTokenDTO refreshTokenDTO)
+            throws InvalidTokenException, DataIntegrityViolationException{
+        User user =  checkIfTokenIsValidAndRefreshTypeAndReturnUser(refreshTokenDTO);
+        tokenRepository.deleteRefreshTokenByUser(user);
+    }
+
+    public AccessToken refresh(@NonNull RefreshTokenDTO refreshTokenDTO) throws InvalidTokenException {
+        User user = checkIfTokenIsValidAndRefreshTypeAndReturnUser(refreshTokenDTO);
         var refreshTokenDb = tokenRepository.findRefreshTokenByUser(user);
         if (refreshTokenDb.isEmpty() ||
                 refreshTokenDb.get().getToken().equals(refreshTokenDTO.getRefreshToken())) {
             throw new InvalidTokenException();
         }
-
         String jwtAccess = jwtService.
                 generateToken(getCurrentUserDetails(), TokenType.ACCESS, null);
-
         return AccessToken.builder()
                 .accessToken(jwtAccess).build();
     }
