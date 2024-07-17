@@ -15,10 +15,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -28,35 +26,32 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest){
-        try{
-            AuthenticationResponse authenticationResponse = authenticationService.register(registerRequest);
-            return ResponseEntity.ok(authenticationResponse);
-        }catch (DataIntegrityViolationException dataIntegrityViolationException){
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST).body(dataIntegrityViolationException.getMessage());
-        }
-
+    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest)
+            throws DataIntegrityViolationException{
+        AuthenticationResponse authenticationResponse = authenticationService.register(registerRequest);
+        return ResponseEntity.ok(authenticationResponse);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthenticationRequest authenticationRequest){
-        try{
-            AuthenticationResponse authenticationResponse = authenticationService.login(authenticationRequest);
-            return ResponseEntity.status(HttpStatus.OK).body(authenticationResponse);
-        }catch (DataIntegrityViolationException | AuthenticationException exception){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
-        }
+    public ResponseEntity<?> login(@RequestBody AuthenticationRequest authenticationRequest)
+            throws DataIntegrityViolationException, AuthenticationException{
+        AuthenticationResponse authenticationResponse = authenticationService.login(authenticationRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(authenticationResponse);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody RefreshTokenDTO refreshTokenDTO){
-        try{
-            AccessToken accessToken = authenticationService.refresh(refreshTokenDTO);
-            return ResponseEntity.status(HttpStatus.OK).body(accessToken);
-        }catch (InvalidTokenException invalidTokenException){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(invalidTokenException.getMessage());
-        }
+    public ResponseEntity<?> refresh(@RequestBody RefreshTokenDTO refreshTokenDTO) throws InvalidTokenException {
+        AccessToken accessToken = authenticationService.refresh(refreshTokenDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(accessToken);
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        return new ResponseEntity<>("Data integrity violation: " + ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<String> handleInvalidTokenException(InvalidTokenException ex) {
+        return new ResponseEntity<>("Username and password are invalid: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 }
