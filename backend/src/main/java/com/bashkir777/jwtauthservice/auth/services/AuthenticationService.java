@@ -108,7 +108,7 @@ public class AuthenticationService {
             throw new InvalidTokenException();
         }
         String jwtAccess = jwtService.
-                generateToken(getCurrentUserDetails(), TokenType.ACCESS, null);
+                generateToken(user, TokenType.ACCESS, null);
         return AccessToken.builder()
                 .accessToken(jwtAccess).build();
     }
