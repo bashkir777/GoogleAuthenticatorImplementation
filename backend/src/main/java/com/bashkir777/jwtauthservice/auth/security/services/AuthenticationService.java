@@ -31,7 +31,11 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public User getCurrentUser() {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof String){
+            return userRepository.getUserByUsername((String)principal);
+        }
+        UserDetails userDetails = (UserDetails) principal;
         return userRepository.getUserByUsername(userDetails.getUsername());
     }
 

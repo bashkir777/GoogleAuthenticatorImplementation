@@ -20,7 +20,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
     @Value(value = "${JWTAuthService.secret-key}")
-    private static String SECRET_KEY;
+    private String SECRET_KEY;
     private final static int WEEK_IN_SECONDS = 7 * 24 * 60 * 60;
     private final static int FIVE_MINUTES_IN_SECONDS = 5 * 60;
 

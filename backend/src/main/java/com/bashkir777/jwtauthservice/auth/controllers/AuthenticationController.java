@@ -3,20 +3,12 @@ package com.bashkir777.jwtauthservice.auth.controllers;
 import com.bashkir777.jwtauthservice.auth.dto.*;
 import com.bashkir777.jwtauthservice.auth.security.exceptions.InvalidTokenException;
 import com.bashkir777.jwtauthservice.auth.security.services.AuthenticationService;
-import com.bashkir777.jwtauthservice.auth.security.services.JwtService;
-import com.bashkir777.jwtauthservice.data.entities.User;
-import com.bashkir777.jwtauthservice.data.enums.TokenType;
-import com.bashkir777.jwtauthservice.data.exceptions.UserCreationException;
-import com.bashkir777.jwtauthservice.data.repositories.TokenRepository;
-import com.bashkir777.jwtauthservice.data.repositories.UserRepository;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
 @RestController
 @RequestMapping("/api/v1/auth")
