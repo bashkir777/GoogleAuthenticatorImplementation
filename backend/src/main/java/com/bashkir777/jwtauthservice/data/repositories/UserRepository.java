@@ -1,4 +1,4 @@
-package com.bashkir777.jwtauthservice.data;
+package com.bashkir777.jwtauthservice.data.repositories;
 
 import com.bashkir777.jwtauthservice.data.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;

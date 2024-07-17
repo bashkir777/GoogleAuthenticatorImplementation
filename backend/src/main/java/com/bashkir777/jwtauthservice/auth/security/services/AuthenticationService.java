@@ -1,15 +1,22 @@
 package com.bashkir777.jwtauthservice.auth.security.services;
 
-import com.bashkir777.jwtauthservice.auth.dto.AuthenticationRequest;
-import com.bashkir777.jwtauthservice.auth.dto.AuthenticationResponse;
-import com.bashkir777.jwtauthservice.auth.dto.RegisterRequest;
-import com.bashkir777.jwtauthservice.data.UserRepository;
+import com.bashkir777.jwtauthservice.auth.dto.*;
+import com.bashkir777.jwtauthservice.auth.security.exceptions.InvalidTokenException;
+import com.bashkir777.jwtauthservice.data.entities.RefreshToken;
+import com.bashkir777.jwtauthservice.data.repositories.TokenRepository;
+import com.bashkir777.jwtauthservice.data.repositories.UserRepository;
 import com.bashkir777.jwtauthservice.data.entities.User;
 import com.bashkir777.jwtauthservice.data.enums.Role;
 import com.bashkir777.jwtauthservice.data.enums.TokenType;
+import io.jsonwebtoken.Claims;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +25,19 @@ import org.springframework.stereotype.Service;
 public class AuthenticationService {
 
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
+    public User getCurrentUser(){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userRepository.getUserByUsername(userDetails.getUsername());
+    }
+
+    public UserDetails getCurrentUserDetails(){
+        return (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 
     private AuthenticationResponse generateTokenPair(User user) {
         var accessToken = jwtService.generateToken(user, TokenType.ACCESS, null);
@@ -35,16 +52,50 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .role(Role.USER).build();
         userRepository.save(user);
-        return generateTokenPair(user);
+        AuthenticationResponse authenticationResponse = generateTokenPair(user);
+        tokenRepository.save(RefreshToken.builder()
+                .token(authenticationResponse.getRefreshToken()).user(getCurrentUser()).build());
+        return authenticationResponse;
     }
 
-    public AuthenticationResponse login(AuthenticationRequest registerRequest) {
+    public AuthenticationResponse login(AuthenticationRequest authenticationRequest) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                registerRequest.getUsername(), registerRequest.getPassword()
+                authenticationRequest.getUsername(), authenticationRequest.getPassword()
         ));
         var user = userRepository
-                .getUserByUsername(registerRequest.getUsername());
-        return generateTokenPair(user);
+                .getUserByUsername(authenticationRequest.getUsername());
+        AuthenticationResponse authenticationResponse = generateTokenPair(user);
+        tokenRepository.save(RefreshToken.builder()
+                .token(authenticationResponse.getRefreshToken()).user(getCurrentUser()).build());
+        return authenticationResponse;
     }
+
+    public AccessToken refresh(@NonNull RefreshTokenDTO refreshTokenDTO) throws InvalidTokenException {
+        String username;
+        TokenType type;
+        try{
+            Claims claims = jwtService.extractAllClaimsAndValidateToken(refreshTokenDTO.getRefreshToken());
+            username = claims.getSubject();
+            type = TokenType.valueOf((String) claims.get("type"));
+        }catch (RuntimeException exception){
+            throw new InvalidTokenException();
+        }
+        User user = userRepository.getUserByUsername(username);
+        if(user == null || !type.equals(TokenType.REFRESH)){
+            throw new InvalidTokenException();
+        }
+        var refreshTokenDb = tokenRepository.findRefreshTokenByUser(user);
+        if(refreshTokenDb.isEmpty() ||
+                refreshTokenDb.get().getToken().equals(refreshTokenDTO.getRefreshToken())){
+            throw new InvalidTokenException();
+        }
+
+        String jwtAccess = jwtService.
+                generateToken(getCurrentUserDetails(), TokenType.ACCESS, null);
+
+        return AccessToken.builder()
+                .accessToken(jwtAccess).build();
+    }
+
 
 }
