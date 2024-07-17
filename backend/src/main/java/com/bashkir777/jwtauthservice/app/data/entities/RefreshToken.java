@@ -1,4 +1,4 @@
-package com.bashkir777.jwtauthservice.data.entities;
+package com.bashkir777.jwtauthservice.app.data.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

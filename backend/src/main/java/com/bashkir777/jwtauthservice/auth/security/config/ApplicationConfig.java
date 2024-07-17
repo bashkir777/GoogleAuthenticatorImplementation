@@ -1,6 +1,6 @@
 package com.bashkir777.jwtauthservice.auth.security.config;
 
-import com.bashkir777.jwtauthservice.data.repositories.UserRepository;
+import com.bashkir777.jwtauthservice.app.data.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

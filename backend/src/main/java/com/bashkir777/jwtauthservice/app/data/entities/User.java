@@ -1,6 +1,6 @@
-package com.bashkir777.jwtauthservice.data.entities;
+package com.bashkir777.jwtauthservice.app.data.entities;
 
-import com.bashkir777.jwtauthservice.data.enums.Role;
+import com.bashkir777.jwtauthservice.app.data.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;

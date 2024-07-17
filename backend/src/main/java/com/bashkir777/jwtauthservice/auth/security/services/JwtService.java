@@ -1,6 +1,6 @@
 package com.bashkir777.jwtauthservice.auth.security.services;
 
-import com.bashkir777.jwtauthservice.data.enums.TokenType;
+import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

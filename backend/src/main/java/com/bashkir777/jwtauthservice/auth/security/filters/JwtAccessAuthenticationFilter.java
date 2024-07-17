@@ -1,7 +1,7 @@
 package com.bashkir777.jwtauthservice.auth.security.filters;
 
 import com.bashkir777.jwtauthservice.auth.security.services.JwtService;
-import com.bashkir777.jwtauthservice.data.enums.TokenType;
+import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -57,7 +57,7 @@ public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
         String username = jwtService.extractUsername(claims);
         TokenType type = jwtService.parseTokenType(claims);
 
-        if (type.equals(TokenType.REFRESH)) {
+        if (type.equals(TokenType.ACCESS)) {
             if (username != null) {
                 UserDetails user = userDetailsService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authToken =
@@ -66,7 +66,6 @@ public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
-                authToken.setAuthenticated(true);
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }else{

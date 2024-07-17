@@ -2,12 +2,12 @@ package com.bashkir777.jwtauthservice.auth.security.services;
 
 import com.bashkir777.jwtauthservice.auth.dto.*;
 import com.bashkir777.jwtauthservice.auth.security.exceptions.InvalidTokenException;
-import com.bashkir777.jwtauthservice.data.entities.RefreshToken;
-import com.bashkir777.jwtauthservice.data.repositories.TokenRepository;
-import com.bashkir777.jwtauthservice.data.repositories.UserRepository;
-import com.bashkir777.jwtauthservice.data.entities.User;
-import com.bashkir777.jwtauthservice.data.enums.Role;
-import com.bashkir777.jwtauthservice.data.enums.TokenType;
+import com.bashkir777.jwtauthservice.app.data.entities.RefreshToken;
+import com.bashkir777.jwtauthservice.app.data.repositories.TokenRepository;
+import com.bashkir777.jwtauthservice.app.data.repositories.UserRepository;
+import com.bashkir777.jwtauthservice.app.data.entities.User;
+import com.bashkir777.jwtauthservice.app.data.enums.Role;
+import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

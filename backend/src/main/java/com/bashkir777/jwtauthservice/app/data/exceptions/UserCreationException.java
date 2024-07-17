@@ -1,4 +1,4 @@
-package com.bashkir777.jwtauthservice.data.exceptions;
+package com.bashkir777.jwtauthservice.app.data.exceptions;
 
 public class UserCreationException extends Exception{
     public UserCreationException(){

@@ -1,7 +1,7 @@
-package com.bashkir777.jwtauthservice.data.repositories;
+package com.bashkir777.jwtauthservice.app.data.repositories;
 
-import com.bashkir777.jwtauthservice.data.entities.RefreshToken;
-import com.bashkir777.jwtauthservice.data.entities.User;
+import com.bashkir777.jwtauthservice.app.data.entities.RefreshToken;
+import com.bashkir777.jwtauthservice.app.data.entities.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
