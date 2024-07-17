@@ -1,6 +1,7 @@
 package com.bashkir777.jwtauthservice.auth.services;
 
 import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
+import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -36,6 +37,7 @@ public class JwtService {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build().parseClaimsJws(jwt).getBody();
+
     }
 
     public TokenType parseTokenType(String jwt) {
@@ -61,7 +63,7 @@ public class JwtService {
     public String generateToken(UserDetails userDetails, TokenType type, @Nullable Map<String, Object> extraClaims) {
         if(extraClaims == null) extraClaims = new HashMap<>();
         extraClaims.put("type", type.name());
-        int timeAliveSeconds = type.equals(TokenType.REFRESH) ? FIVE_MINUTES_IN_SECONDS : WEEK_IN_SECONDS;
+        int timeAliveSeconds = type.equals(TokenType.ACCESS) ? FIVE_MINUTES_IN_SECONDS : WEEK_IN_SECONDS;
         return Jwts.builder().addClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))

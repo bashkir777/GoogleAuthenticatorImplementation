@@ -3,6 +3,7 @@ package com.bashkir777.jwtauthservice.auth.filters;
 import com.bashkir777.jwtauthservice.app.data.entities.RefreshToken;
 import com.bashkir777.jwtauthservice.app.data.entities.User;
 import com.bashkir777.jwtauthservice.app.data.repositories.TokenRepository;
+import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
 import com.bashkir777.jwtauthservice.auth.services.JwtService;
 import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
 import io.jsonwebtoken.Claims;
@@ -30,6 +31,12 @@ public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final TokenRepository tokenRepository;
 
+    private void writeUnauthorizedResponse(@NonNull HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().write(message);
+        response.getWriter().flush();
+    }
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request
@@ -46,18 +53,14 @@ public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String jwt = authHeader.split(" ")[1];
-
         //if token is expired or forged send Error
         Claims claims;
         try{
             claims = jwtService.extractAllClaimsAndValidateToken(jwt);
         }catch (RuntimeException invalidToken){
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(invalidToken.getMessage());
-            response.getWriter().flush();
+            writeUnauthorizedResponse(response, invalidToken.getMessage());
             return;
         }
-
 
         String username = jwtService.extractUsername(claims);
         TokenType type = jwtService.parseTokenType(claims);
@@ -68,9 +71,7 @@ public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
                 Optional<RefreshToken> optionalRefreshToken = tokenRepository.findRefreshTokenByUser((User) user);
 
                 if(optionalRefreshToken.isEmpty()){
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write("You have logged out. This access token is no longer valid");
-                    response.getWriter().flush();
+                    writeUnauthorizedResponse(response, "You have logged out. This access token is no longer valid");
                     return;
                 }
 
@@ -83,9 +84,7 @@ public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }else{
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("refresh token cant be used as an access token");
-            response.getWriter().flush();
+            writeUnauthorizedResponse(response, "refresh token cant be used as an access token");
             return;
         }
 
