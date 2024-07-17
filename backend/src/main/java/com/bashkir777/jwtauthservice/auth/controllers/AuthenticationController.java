@@ -1,8 +1,8 @@
 package com.bashkir777.jwtauthservice.auth.controllers;
 
 import com.bashkir777.jwtauthservice.auth.dto.*;
-import com.bashkir777.jwtauthservice.auth.security.exceptions.InvalidTokenException;
-import com.bashkir777.jwtauthservice.auth.security.services.AuthenticationService;
+import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
+import com.bashkir777.jwtauthservice.auth.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

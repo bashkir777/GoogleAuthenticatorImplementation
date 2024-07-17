@@ -1,4 +1,4 @@
-package com.bashkir777.jwtauthservice.auth.security.config;
+package com.bashkir777.jwtauthservice.auth.config;
 
 import com.bashkir777.jwtauthservice.app.data.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;

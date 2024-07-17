@@ -1,6 +1,6 @@
-package com.bashkir777.jwtauthservice.auth.security.config;
+package com.bashkir777.jwtauthservice.auth.config;
 
-import com.bashkir777.jwtauthservice.auth.security.filters.JwtAccessAuthenticationFilter;
+import com.bashkir777.jwtauthservice.auth.filters.JwtAccessAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.bashkir777.jwtauthservice.auth.security.services;
+package com.bashkir777.jwtauthservice.auth.services;
 
 import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
 import io.jsonwebtoken.Claims;

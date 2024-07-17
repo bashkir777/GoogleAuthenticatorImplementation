@@ -1,7 +1,7 @@
-package com.bashkir777.jwtauthservice.auth.security.services;
+package com.bashkir777.jwtauthservice.auth.services;
 
 import com.bashkir777.jwtauthservice.auth.dto.*;
-import com.bashkir777.jwtauthservice.auth.security.exceptions.InvalidTokenException;
+import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
 import com.bashkir777.jwtauthservice.app.data.entities.RefreshToken;
 import com.bashkir777.jwtauthservice.app.data.repositories.TokenRepository;
 import com.bashkir777.jwtauthservice.app.data.repositories.UserRepository;

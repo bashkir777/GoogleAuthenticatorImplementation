@@ -1,6 +1,6 @@
-package com.bashkir777.jwtauthservice.auth.security.filters;
+package com.bashkir777.jwtauthservice.auth.filters;
 
-import com.bashkir777.jwtauthservice.auth.security.services.JwtService;
+import com.bashkir777.jwtauthservice.auth.services.JwtService;
 import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
