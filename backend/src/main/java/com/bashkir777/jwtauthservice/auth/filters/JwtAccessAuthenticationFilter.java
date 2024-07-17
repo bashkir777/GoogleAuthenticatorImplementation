@@ -1,5 +1,8 @@
 package com.bashkir777.jwtauthservice.auth.filters;
 
+import com.bashkir777.jwtauthservice.app.data.entities.RefreshToken;
+import com.bashkir777.jwtauthservice.app.data.entities.User;
+import com.bashkir777.jwtauthservice.app.data.repositories.TokenRepository;
 import com.bashkir777.jwtauthservice.auth.services.JwtService;
 import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
 import io.jsonwebtoken.Claims;
@@ -18,12 +21,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenRepository tokenRepository;
 
     @Override
     protected void doFilterInternal(
@@ -60,6 +65,15 @@ public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
         if (type.equals(TokenType.ACCESS)) {
             if (username != null) {
                 UserDetails user = userDetailsService.loadUserByUsername(username);
+                Optional<RefreshToken> optionalRefreshToken = tokenRepository.findRefreshTokenByUser((User) user);
+
+                if(optionalRefreshToken.isEmpty()){
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("You have logged out. This access token is no longer valid");
+                    response.getWriter().flush();
+                    return;
+                }
+
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 

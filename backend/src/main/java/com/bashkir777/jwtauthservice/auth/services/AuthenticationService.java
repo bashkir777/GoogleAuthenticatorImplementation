@@ -58,7 +58,7 @@ public class AuthenticationService {
         userRepository.save(user);
         AuthenticationResponse authenticationResponse = generateTokenPair(user);
         tokenRepository.save(RefreshToken.builder()
-                .token(authenticationResponse.getRefreshToken()).user(getCurrentUser()).build());
+                .token(authenticationResponse.getRefreshToken()).user(user).build());
         return authenticationResponse;
     }
 
