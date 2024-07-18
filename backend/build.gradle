@@ -37,6 +37,7 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'dev.samstevens.totp:totp:1.7.1'
+	implementation 'commons-net:commons-net:3.9.0'
 }
 
 tasks.named('test') {

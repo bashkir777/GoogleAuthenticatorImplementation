@@ -23,6 +23,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.UnknownHostException;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -138,7 +140,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse verifyCode(@NonNull VerificationRequest verificationRequest)
-            throws InvalidCode, TFAIsNotEnabled, NoSuchUserException {
+            throws InvalidCode, TFAIsNotEnabled, NoSuchUserException, UnknownHostException {
         var user = userRepository.getUserByUsername(verificationRequest.getUsername());
         if(user == null){
             throw new NoSuchUserException();

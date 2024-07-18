@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.UnknownHostException;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -49,13 +51,18 @@ public class AuthenticationController {
 
     @PostMapping("/verify-code")
     public ResponseEntity<AuthenticationResponse> verifyCode(@RequestBody VerificationRequest verificationRequest)
-            throws InvalidCode, NoSuchUserException, TFAIsNotEnabled {
+            throws InvalidCode, NoSuchUserException, TFAIsNotEnabled, UnknownHostException {
        return ResponseEntity.ok(authenticationService.verifyCode(verificationRequest));
     }
 
     @ExceptionHandler({DataIntegrityViolationException.class, NoSuchUserException.class})
     public ResponseEntity<String> handleDataIntegrityViolationException(Exception ex) {
         return new ResponseEntity<>("Data integrity violation: " + ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({UnknownHostException.class})
+    public ResponseEntity<String> internalServerError(Exception ex) {
+        return new ResponseEntity<>("Exception on our side", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler({InvalidTokenException.class, InvalidCode.class, TFAIsNotEnabled.class})
