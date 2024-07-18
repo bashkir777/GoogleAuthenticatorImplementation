@@ -68,12 +68,6 @@ public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
         if (type.equals(TokenType.ACCESS)) {
             if (username != null) {
                 UserDetails user = userDetailsService.loadUserByUsername(username);
-                Optional<RefreshToken> optionalRefreshToken = tokenRepository.findRefreshTokenByUser((User) user);
-
-                if(optionalRefreshToken.isEmpty()){
-                    writeUnauthorizedResponse(response, "You have logged out. This access token is no longer valid");
-                    return;
-                }
 
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
