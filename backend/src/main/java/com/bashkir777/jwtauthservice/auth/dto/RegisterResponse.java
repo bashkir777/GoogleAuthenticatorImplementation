@@ -9,8 +9,8 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class AuthenticationResponse {
+public class RegisterResponse {
     private String refreshToken;
     private String accessToken;
-    private Boolean tfaEnabled;
+    private String secretImgURI;
 }

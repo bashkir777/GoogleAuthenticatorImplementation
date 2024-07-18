@@ -26,6 +26,8 @@ public class User implements UserDetails {
     private String email;
     private String firstName;
     private String lastName;
+    private String secretKey;
+    private boolean twoFactorAuthenticationEnabled;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private RefreshToken token;

@@ -1,6 +1,8 @@
 package com.bashkir777.jwtauthservice.auth.services;
 
+import com.bashkir777.jwtauthservice.app.data.exceptions.NoSuchUserException;
 import com.bashkir777.jwtauthservice.auth.dto.*;
+import com.bashkir777.jwtauthservice.auth.exceptions.InvalidCode;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
 import com.bashkir777.jwtauthservice.app.data.entities.RefreshToken;
 import com.bashkir777.jwtauthservice.app.data.repositories.TokenRepository;
@@ -8,6 +10,7 @@ import com.bashkir777.jwtauthservice.app.data.repositories.UserRepository;
 import com.bashkir777.jwtauthservice.app.data.entities.User;
 import com.bashkir777.jwtauthservice.app.data.enums.Role;
 import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
+import com.bashkir777.jwtauthservice.auth.exceptions.TFAIsNotEnabled;
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final TwoFactorAuthenticationService tfaService;
 
     public User getCurrentUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -49,17 +53,33 @@ public class AuthenticationService {
         return AuthenticationResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
-    public AuthenticationResponse register(RegisterRequest registerRequest) throws DataIntegrityViolationException{
-        var user = User.builder().firstName(registerRequest.getFirstname())
+    public RegisterResponse register(RegisterRequest registerRequest) throws DataIntegrityViolationException{
+        var userBuilder = User.builder().firstName(registerRequest.getFirstname())
                 .lastName(registerRequest.getLastname())
                 .username(registerRequest.getUsername())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .role(Role.USER).build();
+                .twoFactorAuthenticationEnabled(registerRequest.getTfaEnabled())
+                .role(Role.USER);
+        var registerResponseBuilder = RegisterResponse.builder();
+        if(registerRequest.getTfaEnabled()){
+            String secretKey = tfaService.generateNewSecret();
+            userBuilder.secretKey(secretKey);
+            registerResponseBuilder
+                    .secretImgURI(tfaService.generateQRCodeImageURI(secretKey));
+        }
+        var user = userBuilder.build();
         userRepository.save(user);
-        AuthenticationResponse authenticationResponse = generateTokenPair(user);
+        var tokenPair = generateTokenPair(user);
+        var registerResponse = registerResponseBuilder
+                .accessToken(tokenPair.getAccessToken())
+                .refreshToken(tokenPair.getRefreshToken())
+                .build();
+
         tokenRepository.save(RefreshToken.builder()
-                .token(authenticationResponse.getRefreshToken()).user(user).build());
-        return authenticationResponse;
+                .token(registerResponse.getRefreshToken())
+                .user(user).build());
+
+        return registerResponse;
     }
 
     public AuthenticationResponse login(@NonNull AuthenticationRequest authenticationRequest)
@@ -71,7 +91,11 @@ public class AuthenticationService {
 
         var user = userRepository
                 .getUserByUsername(authenticationRequest.getUsername());
+        if(user.isTwoFactorAuthenticationEnabled()){
+            return AuthenticationResponse.builder().tfaEnabled(true).build();
+        }
         authenticationResponse = generateTokenPair(user);
+        authenticationResponse.setTfaEnabled(false);
         tokenRepository.save(RefreshToken.builder()
                 .token(authenticationResponse.getRefreshToken()).user(user).build());
         return authenticationResponse;
@@ -107,10 +131,28 @@ public class AuthenticationService {
                 refreshTokenDb.get().getToken().equals(refreshTokenDTO.getRefreshToken())) {
             throw new InvalidTokenException();
         }
-        String jwtAccess = jwtService.
+        var jwtAccess = jwtService.
                 generateToken(user, TokenType.ACCESS, null);
         return AccessToken.builder()
                 .accessToken(jwtAccess).build();
+    }
+
+    public AuthenticationResponse verifyCode(@NonNull VerificationRequest verificationRequest)
+            throws InvalidCode, TFAIsNotEnabled, NoSuchUserException {
+        var user = userRepository.getUserByUsername(verificationRequest.getUsername());
+        if(user == null){
+            throw new NoSuchUserException();
+        }
+        if(!user.isTwoFactorAuthenticationEnabled()){
+            throw new TFAIsNotEnabled();
+        }
+        var secret = user.getSecretKey();
+        boolean codeIsValid = tfaService.isOTPValid(secret, verificationRequest.getCode());
+        if(codeIsValid){
+            return generateTokenPair(user);
+        }else{
+            throw new InvalidCode();
+        }
     }
 
 

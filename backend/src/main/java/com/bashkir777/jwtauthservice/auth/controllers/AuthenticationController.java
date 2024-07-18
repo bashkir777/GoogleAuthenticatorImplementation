@@ -1,7 +1,10 @@
 package com.bashkir777.jwtauthservice.auth.controllers;
 
+import com.bashkir777.jwtauthservice.app.data.exceptions.NoSuchUserException;
 import com.bashkir777.jwtauthservice.auth.dto.*;
+import com.bashkir777.jwtauthservice.auth.exceptions.InvalidCode;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
+import com.bashkir777.jwtauthservice.auth.exceptions.TFAIsNotEnabled;
 import com.bashkir777.jwtauthservice.auth.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,10 +21,10 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest registerRequest)
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registerRequest)
             throws DataIntegrityViolationException{
-        AuthenticationResponse authenticationResponse = authenticationService.register(registerRequest);
-        return ResponseEntity.ok(authenticationResponse);
+        RegisterResponse registerResponse = authenticationService.register(registerRequest);
+        return ResponseEntity.ok(registerResponse);
     }
 
     @PostMapping("/login")
@@ -44,13 +47,19 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.OK).body("You have successfully logged out of the system");
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+    @PostMapping("/verify-code")
+    public ResponseEntity<AuthenticationResponse> verifyCode(@RequestBody VerificationRequest verificationRequest)
+            throws InvalidCode, NoSuchUserException, TFAIsNotEnabled {
+       return ResponseEntity.ok(authenticationService.verifyCode(verificationRequest));
+    }
+
+    @ExceptionHandler({DataIntegrityViolationException.class, NoSuchUserException.class})
+    public ResponseEntity<String> handleDataIntegrityViolationException(Exception ex) {
         return new ResponseEntity<>("Data integrity violation: " + ex.getMessage(), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<String> handleInvalidTokenException(InvalidTokenException ex) {
-        return new ResponseEntity<>("Username and password are invalid: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    @ExceptionHandler({InvalidTokenException.class, InvalidCode.class, TFAIsNotEnabled.class})
+    public ResponseEntity<String> handleIAuthExceptions(Exception ex) {
+        return new ResponseEntity<>("Authentication/Authorization failed: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 }

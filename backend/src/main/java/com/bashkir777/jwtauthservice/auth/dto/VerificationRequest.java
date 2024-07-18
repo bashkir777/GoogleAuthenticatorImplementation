@@ -8,9 +8,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class AuthenticationResponse {
-    private String refreshToken;
-    private String accessToken;
-    private Boolean tfaEnabled;
+public class VerificationRequest {
+    private String username;
+    private String code;
 }
