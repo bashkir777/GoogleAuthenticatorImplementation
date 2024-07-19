@@ -7,16 +7,22 @@ const RegisterForm = ({
                           changeLastname,
                           setShowLoginForm,
                           setNextNotClicked,
-                          userData
+                          userData,
+                          validateUserData,
+                          cleanError
                       }) => {
 
     const switchToLogin = (event) => {
         event.preventDefault();
         setShowLoginForm(true);
+        cleanError();
     }
     const switchToQR = (event) => {
         event.preventDefault();
-        setNextNotClicked(false)
+        if(validateUserData(userData) === true){
+            setNextNotClicked(false);
+            cleanError();
+        }
     }
 
     return (
