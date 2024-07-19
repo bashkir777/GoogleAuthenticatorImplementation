@@ -5,6 +5,7 @@ const LoginForm = ({setShowLoginForm}) => {
         event.preventDefault();
         setShowLoginForm(false);
     }
+
     return (
         <section className="vh-100 gradient-custom">
             <div className="container py-3 h-100">

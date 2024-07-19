@@ -1,12 +1,54 @@
 import React from 'react';
 
-const RegisterForm = ({setShowLoginForm}) => {
+const RegisterForm = ({setShowLoginForm, setNextNotClicked}) => {
 
     const switchToLogin = (event) =>{
         event.preventDefault();
         setShowLoginForm(true);
     }
-
+    const switchToQR = (event) =>{
+        event.preventDefault();
+        setNextNotClicked(false)
+    }
+    const [userData, changeUserData] = React.useState({
+        username: '',
+        password: '',
+        firstname: '',
+        lastname: '',
+        secret_key: ''
+    });
+    const changeUsername = (event) => {
+        changeUserData((prevState) => {
+            return {
+                ...prevState,
+                username: event.target.value,
+            }
+        });
+    }
+    const changePassword = (event) => {
+        changeUserData((prevState) =>{
+            return {
+                ...prevState,
+                password: event.target.value,
+            }
+        });
+    }
+    const changeFirstname = (event) => {
+        changeUserData((prevState) => {
+            return {
+                ...prevState,
+                firstname: event.target.value,
+            }
+        });
+    }
+    const changeLastname = (event) => {
+        changeUserData((prevState) =>{
+            return {
+                ...prevState,
+                lastname: event.target.value,
+            }
+        });
+    }
     return (
         <section className="vh-100 gradient-custom">
             <div className="container py-3 h-100">
@@ -18,27 +60,29 @@ const RegisterForm = ({setShowLoginForm}) => {
                                     <h2 className="fw-bold mb-2 text-uppercase">Register</h2>
                                     <p className="text-white-50 mb-5">Please fill in all required fields!</p>
                                     <div data-mdb-input-init className="form-outline form-white mb-2">
-                                        <input type="text" id="typeUsername" className="form-control form-control-lg"/>
+                                        <input type="text" id="typeUsername" className="form-control form-control-lg"
+                                               onChange={changeUsername}/>
                                         <label className="form-label" htmlFor="typeUsername">Username</label>
                                     </div>
                                     <div data-mdb-input-init className="form-outline form-white mb-2">
                                         <input type="password" id="typePasswordX"
-                                               className="form-control form-control-lg"/>
+                                               className="form-control form-control-lg" onChange={changePassword}/>
                                         <label className="form-label" htmlFor="typePasswordX">Password</label>
                                     </div>
                                     <div data-mdb-input-init className="form-outline form-white mb-2">
-                                        <input type="text" id="typeUsername" className="form-control form-control-lg"/>
+                                        <input type="text" id="typeUsername" className="form-control form-control-lg"
+                                               onChange={changeFirstname}/>
                                         <label className="form-label" htmlFor="typeUsername">Firstname</label>
                                     </div>
                                     <div data-mdb-input-init className="form-outline form-white mb-2">
                                         <input type="password" id="typePasswordX"
-                                               className="form-control form-control-lg"/>
+                                               className="form-control form-control-lg" onChange={changeLastname}/>
                                         <label className="form-label" htmlFor="typePasswordX">Lastname</label>
                                     </div>
 
                                     <button data-mdb-button-init data-mdb-ripple-init
-                                            className="btn btn-outline-light btn-lg px-5" type="submit">Create an
-                                        account
+                                            onClick={switchToQR}
+                                            className="btn btn-outline-light btn-lg px-5" type="submit">Next
                                     </button>
                                 </div>
                                 <div>

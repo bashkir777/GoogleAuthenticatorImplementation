@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import LoginForm from "./LoginForm";
-import RegisterForm from "./RegisterForm";
+import RegisterProvider from "./RegisterProvider";
 
 const AuthenticationProvider = () => {
     const [showLoginForm, setShowLoginForm] = useState(true);
     return (
         <>
             {showLoginForm ? <LoginForm setShowLoginForm = {setShowLoginForm}/>
-                : <RegisterForm setShowLoginForm = {setShowLoginForm}/>}
+                : <RegisterProvider setShowLoginForm = {setShowLoginForm}/>}
         </>
     );
 };
