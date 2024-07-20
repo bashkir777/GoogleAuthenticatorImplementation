@@ -3,6 +3,7 @@ package com.bashkir777.jwtauthservice.auth.filters;
 import com.bashkir777.jwtauthservice.app.data.entities.RefreshToken;
 import com.bashkir777.jwtauthservice.app.data.entities.User;
 import com.bashkir777.jwtauthservice.app.data.repositories.TokenRepository;
+import com.bashkir777.jwtauthservice.auth.config.SecurityConfig;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
 import com.bashkir777.jwtauthservice.auth.services.JwtService;
 import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
@@ -23,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Component
 @RequiredArgsConstructor
@@ -43,6 +45,16 @@ public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
             , @NonNull HttpServletResponse response
             , @NonNull FilterChain filterChain)
             throws ServletException, IOException {
+
+        String requestUri = request.getRequestURI();
+        //if list of open uris includes requested uri -> skip filter
+        for (String pattern : SecurityConfig.openUris) {
+            String regexPattern = pattern.replace("**", ".*");
+            if (Pattern.compile(regexPattern).matcher(requestUri).matches()) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+        }
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("BEARER ")) {

@@ -6,6 +6,7 @@ import com.bashkir777.jwtauthservice.auth.exceptions.InvalidCode;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
 import com.bashkir777.jwtauthservice.auth.exceptions.TFAIsNotEnabled;
 import com.bashkir777.jwtauthservice.auth.services.AuthenticationService;
+import com.bashkir777.jwtauthservice.auth.services.TwoFactorAuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import java.net.UnknownHostException;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
+    private final TwoFactorAuthenticationService twoFactorAuthenticationService;
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registerRequest)
@@ -53,6 +55,12 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> verifyCode(@RequestBody VerificationRequest verificationRequest)
             throws InvalidCode, NoSuchUserException, TFAIsNotEnabled, UnknownHostException {
        return ResponseEntity.ok(authenticationService.verifyCode(verificationRequest));
+    }
+    @GetMapping("/generate-qr")
+    public ResponseEntity<QRCode> generateQr() {
+        String secret = twoFactorAuthenticationService.generateNewSecret();
+        QRCode qrCode = new QRCode(twoFactorAuthenticationService.generateQRCodeImageURI(secret));
+        return ResponseEntity.ok(qrCode);
     }
 
     @ExceptionHandler({DataIntegrityViolationException.class, NoSuchUserException.class})

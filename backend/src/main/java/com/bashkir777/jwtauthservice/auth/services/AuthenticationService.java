@@ -56,31 +56,22 @@ public class AuthenticationService {
     }
 
     public RegisterResponse register(RegisterRequest registerRequest) throws DataIntegrityViolationException{
-        var userBuilder = User.builder().firstName(registerRequest.getFirstname())
+        var user = User.builder().firstName(registerRequest.getFirstname())
                 .lastName(registerRequest.getLastname())
                 .username(registerRequest.getUsername())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .twoFactorAuthenticationEnabled(registerRequest.getTfaEnabled())
-                .role(Role.USER);
-        var registerResponseBuilder = RegisterResponse.builder();
-        if(registerRequest.getTfaEnabled()){
-            String secretKey = tfaService.generateNewSecret();
-            userBuilder.secretKey(secretKey);
-            registerResponseBuilder
-                    .secretImgURI(tfaService.generateQRCodeImageURI(secretKey));
-        }
-        var user = userBuilder.build();
+                .secretKey(registerRequest.getSecret())
+                .twoFactorAuthenticationEnabled(true)
+                .role(Role.USER).build();
         userRepository.save(user);
         var tokenPair = generateTokenPair(user);
-        var registerResponse = registerResponseBuilder
+        var registerResponse = RegisterResponse.builder()
                 .accessToken(tokenPair.getAccessToken())
                 .refreshToken(tokenPair.getRefreshToken())
                 .build();
-
         tokenRepository.save(RefreshToken.builder()
                 .token(registerResponse.getRefreshToken())
                 .user(user).build());
-
         return registerResponse;
     }
 
