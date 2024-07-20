@@ -6,6 +6,9 @@ const SecretKeyQrCode = ({setCurrentPage}) => {
     function goBackToInstallation() {
         setCurrentPage(RegisterFlow.INSTALLATION);
     }
+    function goToCodeConfirmation(){
+        setCurrentPage(RegisterFlow.CONFIRMATION_CODE);
+    }
 
     return (
         <>
@@ -34,7 +37,7 @@ const SecretKeyQrCode = ({setCurrentPage}) => {
                     <button type="button" onClick={goBackToInstallation}
                             className="btn btn-dark fs-4 rounded-4 py-3 col-5 ">Go back
                     </button>
-                    <button type="button" onClick={()=>{}}
+                    <button type="button" onClick={goToCodeConfirmation}
                             className="btn btn-dark fs-4 rounded-4 py-3 col-5 offset-2">Got it!
                     </button>
                 </div>

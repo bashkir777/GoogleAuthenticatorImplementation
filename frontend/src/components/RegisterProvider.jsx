@@ -4,6 +4,7 @@ import GoogleAuthenticatorInstallationPage from "./GoogleAuthenticatorInstallati
 import ErrorMessage from "../tools/ErrorMessage";
 import {RegisterFlow} from "../tools/enums";
 import SecretKeyQrCode from "./SecretKeyQrCode";
+import ConfirmCodeWindow from "./ConfirmCodeWindow";
 
 const RegisterProvider = ({setShowLoginForm}) => {
     const [currentPage, setCurrentPage] = useState(RegisterFlow.REGISTER);
@@ -102,6 +103,8 @@ const RegisterProvider = ({setShowLoginForm}) => {
                 <GoogleAuthenticatorInstallationPage setCurrentPage={setCurrentPage}/>}
 
             {currentPage === RegisterFlow.SECRET && <SecretKeyQrCode setCurrentPage={setCurrentPage}/>}
+            {currentPage === RegisterFlow.CONFIRMATION_CODE &&
+                <ConfirmCodeWindow setCurrentPage={setCurrentPage}/>}
 
         </>
     );
