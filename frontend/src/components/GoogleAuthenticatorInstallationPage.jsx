@@ -13,13 +13,13 @@ const GoogleAuthenticatorInstallationPage = ({setCurrentPage}) => {
 
     return (
         <>
-            <div className="container p-5 py-3 my-3 text-center bg-light rounded-5 h2">
+            <div className="container p-5 py-3 my-3 text-center bg-light-subtle rounded-5 h2">
                 <div className="row ms-2">
                     <div className="col-10 text-center d-flex justify-content-center align-items-center pe-0">Please, Download Google Authenticator
                         Mobile App via QR Code
                     </div>
                     <div className="col-2 text-center" ><img width="100px" height="100px" src="/images/google-authenticator-logo.svg"
-                                                   className="border border-2 border-dark-subtle rounded-5"
+                                                   className="border bg-light border-1 border-dark-subtle rounded-5"
                                                    alt="GA logo"/></div>
                 </div>
             </div>
@@ -41,10 +41,9 @@ const GoogleAuthenticatorInstallationPage = ({setCurrentPage}) => {
             </div>
             <div className="container text-end mt-3 mr-3">
                 <div className="row">
-                    <button type="button" onClick={backToRegisterForm} className="btn btn-dark fs-4 rounded-4 py-3 col-2 ">Go back</button>
-                    <button type="button" onClick={goToSecretKeyScan} className="btn btn-dark fs-4 rounded-4 py-3 col-2 offset-8">Got it!</button>
+                    <button type="button" onClick={backToRegisterForm} className="btn btn-dark fs-4 rounded-4 py-3 col-3 offset-1">Go back</button>
+                    <button type="button" onClick={goToSecretKeyScan} className="btn btn-dark fs-4 rounded-4 py-3 col-3 offset-4">Got it!</button>
                 </div>
-
             </div>
         </>
     );
