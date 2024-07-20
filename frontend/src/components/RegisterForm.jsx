@@ -1,4 +1,5 @@
 import React from 'react';
+import {RegisterFlow} from "../tools/enums";
 
 const RegisterForm = ({
                           changeUsername,
@@ -6,7 +7,7 @@ const RegisterForm = ({
                           changeFirstname,
                           changeLastname,
                           setShowLoginForm,
-                          setNextNotClicked,
+                          setCurrentPage,
                           userData,
                           validateUserData,
                           cleanError
@@ -17,10 +18,10 @@ const RegisterForm = ({
         setShowLoginForm(true);
         cleanError();
     }
-    const switchToQR = (event) => {
+    const switchToInstallation = (event) => {
         event.preventDefault();
         if(validateUserData(userData) === true){
-            setNextNotClicked(false);
+            setCurrentPage(RegisterFlow.INSTALLATION)
             cleanError();
         }
     }
@@ -59,7 +60,7 @@ const RegisterForm = ({
                                     </div>
 
                                     <button data-mdb-button-init data-mdb-ripple-init
-                                            onClick={switchToQR}
+                                            onClick={switchToInstallation}
                                             className="btn btn-outline-light btn-lg px-5" type="submit">Next
                                     </button>
                                 </div>
