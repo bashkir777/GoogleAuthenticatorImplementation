@@ -5,3 +5,5 @@ export const SECRET_QR_URL = AUTH_URL + "/generate-secret-qr-url/";
 export const LOGIN_URL = AUTH_URL + "/login";
 export const REGISTER_URL = AUTH_URL + "/register";
 export const REFRESH_URL = AUTH_URL + "/refresh";
+export const VERIFICATION_URL = AUTH_URL + "/tfa-verification";
+export const TFA_ENABLES_URL = AUTH_URL + "/tfa-enabled/";

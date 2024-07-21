@@ -10,12 +10,14 @@ import com.bashkir777.jwtauthservice.app.data.repositories.UserRepository;
 import com.bashkir777.jwtauthservice.app.data.entities.User;
 import com.bashkir777.jwtauthservice.app.data.enums.Role;
 import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
+import com.bashkir777.jwtauthservice.auth.exceptions.TFAIsEnabled;
 import com.bashkir777.jwtauthservice.auth.exceptions.TFAIsNotEnabled;
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,8 +40,8 @@ public class AuthenticationService {
 
     public User getCurrentUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(principal instanceof String){
-            return userRepository.getUserByUsername((String)principal);
+        if (principal instanceof String) {
+            return userRepository.getUserByUsername((String) principal);
         }
         UserDetails userDetails = (UserDetails) principal;
         return userRepository.getUserByUsername(userDetails.getUsername());
@@ -55,9 +57,18 @@ public class AuthenticationService {
         return AuthenticationResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
+    public boolean tfaEnabled(String username) throws BadCredentialsException {
+        var user = userRepository
+                .getUserByUsername(username);
+        if (user == null) {
+            throw new BadCredentialsException("No such user");
+        }
+        return user.isTwoFactorAuthenticationEnabled();
+    }
+
     public RegisterResponse register(RegisterRequest registerRequest)
             throws DataIntegrityViolationException, InvalidCode, UnknownHostException {
-        if(!tfaService.isOTPValid(registerRequest.getSecret(), registerRequest.getOtp())){
+        if (!tfaService.isOTPValid(registerRequest.getSecret(), registerRequest.getOtp())) {
             throw new InvalidCode();
         }
         var user = User.builder().firstName(registerRequest.getFirstname())
@@ -80,17 +91,19 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse login(@NonNull AuthenticationRequest authenticationRequest)
-            throws DataIntegrityViolationException, AuthenticationException {
+            throws DataIntegrityViolationException, AuthenticationException, TFAIsEnabled, BadCredentialsException {
+        var user = userRepository
+                .getUserByUsername(authenticationRequest.getUsername());
+        if (user == null) {
+            throw new BadCredentialsException("No such user");
+        }
+        if (user.isTwoFactorAuthenticationEnabled()) {
+            throw new TFAIsEnabled("tfa is enabled, you should use /tfa-verification endpoint instead of /login");
+        }
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 authenticationRequest.getUsername(), authenticationRequest.getPassword()
         ));
         AuthenticationResponse authenticationResponse;
-
-        var user = userRepository
-                .getUserByUsername(authenticationRequest.getUsername());
-        if(user.isTwoFactorAuthenticationEnabled()){
-            return AuthenticationResponse.builder().tfaEnabled(true).build();
-        }
         authenticationResponse = generateTokenPair(user);
         authenticationResponse.setTfaEnabled(false);
         tokenRepository.save(RefreshToken.builder()
@@ -98,7 +111,7 @@ public class AuthenticationService {
         return authenticationResponse;
     }
 
-    private User checkIfTokenIsValidAndRefreshTypeAndReturnUser(RefreshTokenDTO refreshTokenDTO) throws InvalidTokenException{
+    private User checkIfTokenIsValidAndRefreshTypeAndReturnUser(RefreshTokenDTO refreshTokenDTO) throws InvalidTokenException {
         String username;
         TokenType type;
         try {
@@ -116,8 +129,8 @@ public class AuthenticationService {
     }
 
     public void logout(@NonNull RefreshTokenDTO refreshTokenDTO)
-            throws InvalidTokenException, DataIntegrityViolationException{
-        User user =  checkIfTokenIsValidAndRefreshTypeAndReturnUser(refreshTokenDTO);
+            throws InvalidTokenException, DataIntegrityViolationException {
+        User user = checkIfTokenIsValidAndRefreshTypeAndReturnUser(refreshTokenDTO);
         tokenRepository.deleteRefreshTokenByUser(user);
     }
 
@@ -134,20 +147,23 @@ public class AuthenticationService {
                 .accessToken(jwtAccess).build();
     }
 
-    public AuthenticationResponse verifyCode(@NonNull VerificationRequest verificationRequest)
-            throws InvalidCode, TFAIsNotEnabled, NoSuchUserException, UnknownHostException {
-        var user = userRepository.getUserByUsername(verificationRequest.getUsername());
-        if(user == null){
-            throw new NoSuchUserException();
+    public AuthenticationResponse verifyCode(@NonNull TFAVerificationRequest TFAVerificationRequest)
+            throws InvalidCode, TFAIsNotEnabled, NoSuchUserException, UnknownHostException, BadCredentialsException {
+        var user = userRepository.getUserByUsername(TFAVerificationRequest.getUsername());
+        if (user == null) {
+            throw new BadCredentialsException("There is no user with username " + TFAVerificationRequest.getUsername());
         }
-        if(!user.isTwoFactorAuthenticationEnabled()){
+        if (!passwordEncoder.matches(TFAVerificationRequest.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Invalid password");
+        }
+        if (!user.isTwoFactorAuthenticationEnabled()) {
             throw new TFAIsNotEnabled();
         }
         var secret = user.getSecretKey();
-        boolean codeIsValid = tfaService.isOTPValid(secret, verificationRequest.getCode());
-        if(codeIsValid){
+        boolean codeIsValid = tfaService.isOTPValid(secret, TFAVerificationRequest.getOtp());
+        if (codeIsValid) {
             return generateTokenPair(user);
-        }else{
+        } else {
             throw new InvalidCode();
         }
     }

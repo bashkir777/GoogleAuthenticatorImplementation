@@ -49,7 +49,7 @@ const ConfirmCodeWindow = ({onSubmitURL, setCurrentPage, prevPageFlow, setOTP, u
                 body: JSON.stringify(userData)
             }).then(response => {
                 if (!response.ok) {
-                    throw new Error("Error creating user");
+                    throw new Error("Authorization/Authentication Error");
                 }
                 return response.json();
             }).then(data => {
