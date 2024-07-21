@@ -1,7 +1,7 @@
 import React from 'react';
 import '../styles/utility-styles.css'
 import QrCodeComponent from "../tools/QrCodeComponent";
-import {RegisterFlow} from "../tools/enums";
+import {RegisterFlow} from "../tools/consts";
 
 const GoogleAuthenticatorInstallationPage = ({setCurrentPage}) => {
     const backToRegisterForm = () => {

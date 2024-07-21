@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import RegisterForm from "./RegisterForm";
 import GoogleAuthenticatorInstallationPage from "./GoogleAuthenticatorInstallationPage";
 import ErrorMessage from "../tools/ErrorMessage";
-import {RegisterFlow} from "../tools/enums";
+import {RegisterFlow} from "../tools/consts";
 import SecretKeyQrCode from "./SecretKeyQrCode";
 import ConfirmCodeWindow from "./ConfirmCodeWindow";
 
@@ -87,22 +87,32 @@ const RegisterProvider = ({setShowLoginForm}) => {
             }
         });
     }
+    const setSecretKey = (newKey) => {
+        changeUserData((prevState) => {
+            return {
+                ...prevState,
+                secret_key: newKey,
+            }
+        });
+    }
 
     return (
         <>
             {error && <ErrorMessage message={errorMessage} onClose={cleanError}/>}
-            {currentPage === RegisterFlow.REGISTER && <RegisterForm changeUsername={changeUsername} changePassword={changePassword}
-                                                                    changeFirstname={changeFirstname}
-                                                                    changeLastname={changeLastname}
-                                                                    validateUserData={validateUserData}
-                                                                    userData={userData}
-                                                                    setShowLoginForm={setShowLoginForm}
-                                                                    setCurrentPage={setCurrentPage}
-                                                                    cleanError={cleanError}/>}
+            {currentPage === RegisterFlow.REGISTER &&
+                <RegisterForm changeUsername={changeUsername} changePassword={changePassword}
+                              changeFirstname={changeFirstname}
+                              changeLastname={changeLastname}
+                              validateUserData={validateUserData}
+                              userData={userData}
+                              setShowLoginForm={setShowLoginForm}
+                              setCurrentPage={setCurrentPage}
+                              cleanError={cleanError}/>}
             {currentPage === RegisterFlow.INSTALLATION &&
                 <GoogleAuthenticatorInstallationPage setCurrentPage={setCurrentPage}/>}
 
-            {currentPage === RegisterFlow.SECRET && <SecretKeyQrCode setCurrentPage={setCurrentPage}/>}
+            {currentPage === RegisterFlow.SECRET &&
+                <SecretKeyQrCode setSecretKey={setSecretKey} userData={userData} setCurrentPage={setCurrentPage}/>}
             {currentPage === RegisterFlow.CONFIRMATION_CODE &&
                 <ConfirmCodeWindow setCurrentPage={setCurrentPage}/>}
 

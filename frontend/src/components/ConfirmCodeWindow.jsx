@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {RegisterFlow} from "../tools/enums";
+import {RegisterFlow} from "../tools/consts";
 
 const ConfirmCodeWindow = ({setCurrentPage}) => {
     const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -69,6 +69,7 @@ const ConfirmCodeWindow = ({setCurrentPage}) => {
                                     maxLength="1"
                                     key={index}
                                     value={data}
+                                    onChange={()=>{}}
                                     onKeyDown={e => handleKeyDown(e.target, index, e)}
                                     onFocus={e => e.target.select()}
                                     ref={el => inputRefs.current[index] = el}

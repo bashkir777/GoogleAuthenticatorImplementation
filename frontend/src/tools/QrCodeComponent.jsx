@@ -1,18 +1,25 @@
-import React from 'react';
+import React, {useState, forwardRef, useImperativeHandle} from 'react';
 import QRCode from 'qrcode.react';
 
-const QrCodeComponent = ({url, className}) => {
+const QrCodeComponent = forwardRef((props, ref) => {
+    const [url, setUrl] = useState(props.url);
+    useImperativeHandle(ref, () => ({
+        setUrl: (newUrl) => {
+            setUrl(newUrl);
+        }
+    }));
     return (
         <>
             <QRCode
-                value={url}
+                value={url.toString()}
                 size={350}
                 includeMargin={true}
                 renderAs="svg"
-                className={className}
+                className={props.className}
             />
         </>
     );
-};
+})
+
 
 export default QrCodeComponent;

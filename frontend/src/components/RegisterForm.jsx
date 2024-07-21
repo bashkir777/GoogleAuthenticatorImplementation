@@ -1,5 +1,5 @@
 import React from 'react';
-import {RegisterFlow} from "../tools/enums";
+import {RegisterFlow} from "../tools/consts";
 
 const RegisterForm = ({
                           changeUsername,

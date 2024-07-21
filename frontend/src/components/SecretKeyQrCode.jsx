@@ -1,14 +1,30 @@
-import React from 'react';
-import {RegisterFlow} from "../tools/enums";
+import React, {useEffect, useRef} from 'react';
+import {RegisterFlow, TEST_QR_LINE} from "../tools/consts";
 import QrCodeComponent from "../tools/QrCodeComponent";
+import BACKEND_URL from "../tools/consts";
+import qrCodeComponent from "../tools/QrCodeComponent";
 
-const SecretKeyQrCode = ({setCurrentPage}) => {
+const SecretKeyQrCode = ({setCurrentPage, userData, setSecretKey}) => {
+
     function goBackToInstallation() {
         setCurrentPage(RegisterFlow.INSTALLATION);
     }
     function goToCodeConfirmation(){
         setCurrentPage(RegisterFlow.CONFIRMATION_CODE);
     }
+    const qrComponent = useRef(null);
+
+    useEffect(() => {
+        if(userData.secret_key === ""){
+            // fetch(BACKEND_URL + "/api/v1/auth/generate-qr")
+            //     .then(res => res.json()).then(data => setSecretKey(data.secret_key)
+            //     .catch(err => console.log(err)));
+            setSecretKey(TEST_QR_LINE)
+        }
+        if(qrComponent.current){
+            qrComponent.current.setUrl(userData.secret_key);
+        }
+    }, []);
 
     return (
         <>
@@ -27,8 +43,9 @@ const SecretKeyQrCode = ({setCurrentPage}) => {
             <div className="container bg-light-subtle rounded-bottom-5 border border-1 border-dark-subtle border-top-0 w-50">
                 <div className="row">
                     <QrCodeComponent
+                        ref={qrComponent}
                         className="col py-4 rounded-4 bg-light"
-                        url="quqP5VaHBSliXnkYzQe2Nr4+ej2ufLNuOF93PA+bngfN7yPX4Yv81Gu6tcYrZvfhz1aGQ3kqkxTTAIzWyjW/mj2WM/mk80fymSywFT81dVDLlfP+vsSn0LYZLANijaXeNF5J1iVD362Eq/mD8s/6WBVYCQXWPgqPrJWJYGhiiL35cX0q3x+ef17eA7C1qukypJLlbqAHHDEy6COhmw6aiskhWdX2nQ+HGbTUbSqoUy7jylpOzCS6sSSA1ZbeZEl0kpGatFTXXV8lQnWC3uxz4oBMA5v8wtp4NrpI5wDoCZCMYzko37ajg+H5Rnu6ikYtVjoFr1WwHLAK3K147Qw0qogmknYLDCHVZcLjDfN0kcKGe64Kw+MT7CNBdZMe9CYZIuHNHCTMg3MBdQq2kpKmn7p9G3vPhzWdhM8BxJ4i4Wmc9r4EDKnw8HHAV45w6bDHEMRVPWpLLCpoXhHwwYkR/nfQtTskXs6PM1TMdKKFJbgIixkkTlZYCSiglCyjR7w0gOS15EHNnTTz9suOyGXoibWSsk0sA6uUfe71yNqij5C4BBBNQ08pI8c49vNRd7GdtwpMZUI5qxOFYniQLLaysec4jEHHEc1jOQScYmKeJnWQsA0sLYeaaiEgRTQl4auah4YuZZEihT6qyh2bJ5VRhZ4bjEtLg4qES9xOJl5mwbmj+ElPNPieFZoq2qqx5IssDPaiP0O4HZCQwcUONfk88Bulb6MhKlYgpJej4O9bdvx4bArszyDf2QkrWXOInh5zAFzNsMqncjFTpBG8mAtr6uYBSZSGnXZqSNdEw8TzSUZc8D+Koa00TnE6CZkHHEnZ9LA66gWJD21/hXQiZoqMhGs3pGLlLFFURNtVYjc3XWnw9M/plljG6KP2HdYe/EmAXPAMVQUM9cqasYze7PAIQ4PXjdgciZg2gpVGUngOqRVmOcZOFqIl/jae1udD7PjoBgCFm06RI1gCQuQC55NhItEelHbEPHLVDaY2eWlzu8anxux9qt0B8Mqum1CqFlZXTbWwiSwa0ZPIeCMmqlh5/ddDSWzwD8dN7yPG97HDe/jhvfxV+A3fYlWOgxd9msAAAAASUVORK5CYII="/>
+                        url=""/>
                 </div>
 
             </div>
