@@ -11,7 +11,7 @@ const QrCodeComponent = forwardRef((props, ref) => {
     return (
         <>
             <QRCode
-                value={url.toString()}
+                value={url}
                 size={350}
                 includeMargin={true}
                 renderAs="svg"

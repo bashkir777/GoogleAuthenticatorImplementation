@@ -15,7 +15,7 @@ const RegisterProvider = ({setShowLoginForm}) => {
         password: '',
         firstname: '',
         lastname: '',
-        secret_key: ''
+        secretQrUrl: ''
     });
     const validateString = (inputStr) => {
         if (!inputStr) return false;
@@ -87,11 +87,11 @@ const RegisterProvider = ({setShowLoginForm}) => {
             }
         });
     }
-    const setSecretKey = (newKey) => {
+    const setSecretQrUrl = (newSecretQrUrl) => {
         changeUserData((prevState) => {
             return {
                 ...prevState,
-                secret_key: newKey,
+                secretQrUrl: newSecretQrUrl,
             }
         });
     }
@@ -112,7 +112,7 @@ const RegisterProvider = ({setShowLoginForm}) => {
                 <GoogleAuthenticatorInstallationPage setCurrentPage={setCurrentPage}/>}
 
             {currentPage === RegisterFlow.SECRET &&
-                <SecretKeyQrCode setSecretKey={setSecretKey} userData={userData} setCurrentPage={setCurrentPage}/>}
+                <SecretKeyQrCode setSecretQrUrl={setSecretQrUrl} userData={userData} setCurrentPage={setCurrentPage}/>}
             {currentPage === RegisterFlow.CONFIRMATION_CODE &&
                 <ConfirmCodeWindow setCurrentPage={setCurrentPage}/>}
 

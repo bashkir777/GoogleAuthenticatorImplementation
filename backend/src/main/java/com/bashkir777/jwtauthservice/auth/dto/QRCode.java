@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class QRCode {
-    private String qrCodeUrl;
+    private String secretQrUrl;
 }
