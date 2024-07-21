@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
 import RegisterForm from "./RegisterForm";
 import GoogleAuthenticatorInstallationPage from "./GoogleAuthenticatorInstallationPage";
-import ErrorMessage from "../tools/ErrorMessage";
-import {RegisterFlow} from "../tools/consts";
+import ErrorMessage from "../../tools/ErrorMessage";
+import {RegisterFlow} from "../../tools/consts";
 import SecretKeyQrCode from "./SecretKeyQrCode";
 import ConfirmCodeWindow from "./ConfirmCodeWindow";
 
-const RegisterProvider = ({setShowLoginForm}) => {
+const RegisterProvider = ({setShowLoginForm, setAuthenticated}) => {
     const [currentPage, setCurrentPage] = useState(RegisterFlow.REGISTER);
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -15,7 +15,8 @@ const RegisterProvider = ({setShowLoginForm}) => {
         password: '',
         firstname: '',
         lastname: '',
-        secretQrUrl: ''
+        secret: '',
+        otp: ''
     });
     const validateString = (inputStr) => {
         if (!inputStr) return false;
@@ -87,11 +88,19 @@ const RegisterProvider = ({setShowLoginForm}) => {
             }
         });
     }
-    const setSecretQrUrl = (newSecretQrUrl) => {
+    const setSecret = (newSecret) => {
         changeUserData((prevState) => {
             return {
                 ...prevState,
-                secretQrUrl: newSecretQrUrl,
+                secret: newSecret
+            }
+        });
+    }
+    const setOTP = (newOTP) => {
+        changeUserData((prevState) => {
+            return {
+                ...prevState,
+                otp: newOTP,
             }
         });
     }
@@ -112,9 +121,9 @@ const RegisterProvider = ({setShowLoginForm}) => {
                 <GoogleAuthenticatorInstallationPage setCurrentPage={setCurrentPage}/>}
 
             {currentPage === RegisterFlow.SECRET &&
-                <SecretKeyQrCode setSecretQrUrl={setSecretQrUrl} userData={userData} setCurrentPage={setCurrentPage}/>}
+                <SecretKeyQrCode setSecret={setSecret} userData={userData} setCurrentPage={setCurrentPage}/>}
             {currentPage === RegisterFlow.CONFIRMATION_CODE &&
-                <ConfirmCodeWindow setCurrentPage={setCurrentPage}/>}
+                <ConfirmCodeWindow userData={userData} setAuthenticated={setAuthenticated} setOTP={setOTP} setCurrentPage={setCurrentPage}/>}
 
         </>
     );

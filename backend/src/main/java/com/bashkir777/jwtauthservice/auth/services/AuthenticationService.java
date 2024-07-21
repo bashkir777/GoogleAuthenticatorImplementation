@@ -55,7 +55,11 @@ public class AuthenticationService {
         return AuthenticationResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
-    public RegisterResponse register(RegisterRequest registerRequest) throws DataIntegrityViolationException{
+    public RegisterResponse register(RegisterRequest registerRequest)
+            throws DataIntegrityViolationException, InvalidCode, UnknownHostException {
+        if(!tfaService.isOTPValid(registerRequest.getSecret(), registerRequest.getOtp())){
+            throw new InvalidCode();
+        }
         var user = User.builder().firstName(registerRequest.getFirstname())
                 .lastName(registerRequest.getLastname())
                 .username(registerRequest.getUsername())

@@ -1,14 +1,9 @@
 package com.bashkir777.jwtauthservice.auth.services;
 
 import dev.samstevens.totp.code.*;
-import dev.samstevens.totp.exceptions.QrGenerationException;
-import dev.samstevens.totp.qr.QrData;
-import dev.samstevens.totp.qr.QrGenerator;
-import dev.samstevens.totp.qr.ZxingPngQrGenerator;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.time.NtpTimeProvider;
 import dev.samstevens.totp.time.TimeProvider;
-import dev.samstevens.totp.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

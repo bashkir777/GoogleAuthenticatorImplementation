@@ -1,30 +1,82 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {RegisterFlow} from "../tools/consts";
+import {RegisterFlow} from "../../tools/consts";
+import ErrorMessage from "../../tools/ErrorMessage";
+import {REGISTER_URL} from "../../tools/urls";
 
-const ConfirmCodeWindow = ({setCurrentPage}) => {
+const ConfirmCodeWindow = ({setCurrentPage, setOTP, userData, setAuthenticated}) => {
     const [otp, setOtp] = useState(new Array(6).fill(""));
     const inputRefs = useRef([]);
-
+    const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const [error, setError] = useState(false);
+    const [readyToSubmit, setReadyToSubmit] = useState(false);
     useEffect(() => {
         if (inputRefs.current[0]) {
             inputRefs.current[0].focus();
         }
     }, []);
+
+    function validateOTP() {
+        for (let char of otp) {
+            if (char === "" || !(char in digits)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function otpToString() {
+        let res = "";
+        for (let char of otp) {
+            res += char;
+        }
+        return res;
+    }
+
+    const submitHandler = () => {
+        if (validateOTP()) {
+            setOTP(otpToString());
+            setReadyToSubmit(true);
+        } else {
+            setError(true);
+        }
+    };
+
+    useEffect(() => {
+        if (readyToSubmit) {
+            fetch(REGISTER_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error("Error creating user");
+                }
+                return response.json();
+            }).then(data => {
+                setAuthenticated(true);
+                localStorage.setItem("tokens", JSON.stringify(data));
+            }).catch(err => console.log(err))
+                .finally(() => setReadyToSubmit(false));
+        }
+    }, [readyToSubmit, userData]);
+
     const handleKeyDown = (element, index, event) => {
-        if(event.key in [0,1,2,3,4,5,6,7,8,9]){
-            setOtp( (prevState) =>{
+        if (event.key in digits) {
+            setOtp((prevState) => {
                 let newOtp = [...prevState];
                 newOtp[index] = event.key;
                 return newOtp;
             })
-            if(index < 5){
+            if (index < 5) {
                 element.nextSibling.focus();
             }
-        }else if(event.key === "Backspace"){
-            if(element.value === "" && index !== 0){
+        } else if (event.key === "Backspace") {
+            if (element.value === "" && index !== 0) {
                 element.previousSibling.focus();
-            }else{
-                setOtp( (prevState) =>{
+            } else {
+                setOtp((prevState) => {
                     let newOtp = [...prevState];
                     newOtp[index] = "";
                     return newOtp;
@@ -40,6 +92,9 @@ const ConfirmCodeWindow = ({setCurrentPage}) => {
 
     return (
         <div className="container pt-5">
+            {error && <ErrorMessage
+                message={"The confirmation code must be exactly 6 digits long. Please enter a valid code."}
+                onClose={() => setError(false)}/>}
             <div
                 className="container w-50 p-3 text-center bg-light rounded-top-5 h2 mb-0 mt-5">
                 <div className="row row-cols-5 rounded-3 mt-5 ms-2">
@@ -69,7 +124,8 @@ const ConfirmCodeWindow = ({setCurrentPage}) => {
                                     maxLength="1"
                                     key={index}
                                     value={data}
-                                    onChange={()=>{}}
+                                    onChange={() => {
+                                    }}
                                     onKeyDown={e => handleKeyDown(e.target, index, e)}
                                     onFocus={e => e.target.select()}
                                     ref={el => inputRefs.current[index] = el}
@@ -84,7 +140,7 @@ const ConfirmCodeWindow = ({setCurrentPage}) => {
                     <button type="button" onClick={backToQrScan}
                             className="btn btn-dark fs-4 rounded-4 py-3 col-5 ">Go back
                     </button>
-                    <button type="button" onClick={()=>{}}
+                    <button type="button" onClick={submitHandler}
                             className="btn btn-dark fs-4 rounded-4 py-3 col-5 offset-2">Submit
                     </button>
                 </div>

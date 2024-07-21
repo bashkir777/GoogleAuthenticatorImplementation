@@ -26,9 +26,9 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registerRequest)
-            throws DataIntegrityViolationException{
+            throws DataIntegrityViolationException, UnknownHostException, InvalidCode {
         RegisterResponse registerResponse = authenticationService.register(registerRequest);
-        return ResponseEntity.ok(registerResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
     }
 
     @PostMapping("/login")

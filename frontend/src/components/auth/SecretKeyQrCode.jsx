@@ -1,11 +1,10 @@
-import React, {useEffect, useRef} from 'react';
-import {RegisterFlow} from "../tools/consts";
-import {TEST_QR_LINE, SECRET_QR_URL} from "../tools/urls"
-import QrCodeComponent from "../tools/QrCodeComponent";
-import BACKEND_URL from "../tools/urls";
-import qrCodeComponent from "../tools/QrCodeComponent";
+import React, {useEffect, useRef, useState} from 'react';
+import {RegisterFlow} from "../../tools/consts";
+import {SECRET_QR_URL} from "../../tools/urls"
+import QrCodeComponent from "../../tools/QrCodeComponent";
+import {parseOtpAuthUrl} from "../../tools/utils"
 
-const SecretKeyQrCode = ({setCurrentPage, userData, setSecretQrUrl}) => {
+const SecretKeyQrCode = ({setCurrentPage, userData, setSecret}) => {
 
     function goBackToInstallation() {
         setCurrentPage(RegisterFlow.INSTALLATION);
@@ -14,27 +13,24 @@ const SecretKeyQrCode = ({setCurrentPage, userData, setSecretQrUrl}) => {
         setCurrentPage(RegisterFlow.CONFIRMATION_CODE);
     }
     const qrComponent = useRef(null);
+    const [secretQrUrl, setSecretQrUrl] = useState('');
+
     useEffect(() => {
-        if(userData.secretQrUrl === ''){
+        if(secretQrUrl === ''){
             fetch(SECRET_QR_URL + userData.username)
                 .then(res => {
-                    if (!res.ok) {
-                        throw new Error(`HTTP error! Status: ${res.status}`);
-                    }
                     return res.json();
                 })
                 .then(data => {
-                    console.log("Received data: ", data);
                     setSecretQrUrl(data.secretQrUrl);
                 })
                 .catch(err => console.log("Error fetching data: ", err));
-
-            // setSecretQrUrl(TEST_QR_LINE)
         }
-        if(qrComponent.current){
-            qrComponent.current.setUrl(userData.secretQrUrl);
+        if(qrComponent.current && secretQrUrl !== ''){
+            qrComponent.current.setUrl(secretQrUrl);
+            setSecret(parseOtpAuthUrl(secretQrUrl).secret)
         }
-    }, [userData.secretQrUrl]);
+    }, [secretQrUrl]);
 
     return (
         <>
