@@ -1,13 +1,15 @@
 import React, {useState} from 'react';
-import LoginForm from "./LoginForm";
 import RegisterProvider from "./RegisterProvider";
+import {AuthenticationFlow} from "../../tools/consts";
+import LoginProvider from "./LoginProvider";
 
 const AuthenticationProvider = ({setAuthenticated}) => {
-    const [showLoginForm, setShowLoginForm] = useState(true);
+    const [authenticationPage, setAuthenticationPage] = useState(AuthenticationFlow.LOGIN)
     return (
         <>
-            {showLoginForm ? <LoginForm setShowLoginForm = {setShowLoginForm}/>
-                : <RegisterProvider setAuthenticated={setAuthenticated} setShowLoginForm = {setShowLoginForm}/>}
+            {authenticationPage === AuthenticationFlow.LOGIN && <LoginProvider setAuthenticationPage={setAuthenticationPage}/>}
+            {authenticationPage === AuthenticationFlow.REGISTER &&
+                <RegisterProvider setAuthenticated={setAuthenticated} setAuthenticationPage={setAuthenticationPage}/>}
         </>
     );
 };

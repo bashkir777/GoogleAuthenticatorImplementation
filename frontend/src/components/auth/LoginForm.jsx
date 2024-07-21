@@ -1,9 +1,10 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-const LoginForm = ({setShowLoginForm}) => {
+import {AuthenticationFlow} from "../../tools/consts";
+const LoginForm = ({setAuthenticationPage}) => {
     const switchToRegister = (event)=>{
         event.preventDefault();
-        setShowLoginForm(false);
+        setAuthenticationPage(AuthenticationFlow.REGISTER);
     }
 
     return (

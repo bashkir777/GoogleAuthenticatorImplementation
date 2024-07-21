@@ -5,8 +5,9 @@ import ErrorMessage from "../../tools/ErrorMessage";
 import {RegisterFlow} from "../../tools/consts";
 import SecretKeyQrCode from "./SecretKeyQrCode";
 import ConfirmCodeWindow from "./ConfirmCodeWindow";
+import {REGISTER_URL} from "../../tools/urls";
 
-const RegisterProvider = ({setShowLoginForm, setAuthenticated}) => {
+const RegisterProvider = ({setAuthenticationPage, setAuthenticated}) => {
     const [currentPage, setCurrentPage] = useState(RegisterFlow.REGISTER);
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -114,7 +115,7 @@ const RegisterProvider = ({setShowLoginForm, setAuthenticated}) => {
                               changeLastname={changeLastname}
                               validateUserData={validateUserData}
                               userData={userData}
-                              setShowLoginForm={setShowLoginForm}
+                              setAuthenticationPage={setAuthenticationPage}
                               setCurrentPage={setCurrentPage}
                               cleanError={cleanError}/>}
             {currentPage === RegisterFlow.INSTALLATION &&
@@ -123,7 +124,9 @@ const RegisterProvider = ({setShowLoginForm, setAuthenticated}) => {
             {currentPage === RegisterFlow.SECRET &&
                 <SecretKeyQrCode setSecret={setSecret} userData={userData} setCurrentPage={setCurrentPage}/>}
             {currentPage === RegisterFlow.CONFIRMATION_CODE &&
-                <ConfirmCodeWindow userData={userData} setAuthenticated={setAuthenticated} setOTP={setOTP} setCurrentPage={setCurrentPage}/>}
+                <ConfirmCodeWindow onSubmitURL={REGISTER_URL} userData={userData} prevPageFlow={RegisterFlow.SECRET}
+                                   setAuthenticated={setAuthenticated} setOTP={setOTP}
+                                   setCurrentPage={setCurrentPage}/>}
 
         </>
     );

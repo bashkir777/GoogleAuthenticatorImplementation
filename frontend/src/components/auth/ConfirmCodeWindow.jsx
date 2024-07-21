@@ -1,9 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {RegisterFlow} from "../../tools/consts";
 import ErrorMessage from "../../tools/ErrorMessage";
-import {REGISTER_URL} from "../../tools/urls";
 
-const ConfirmCodeWindow = ({setCurrentPage, setOTP, userData, setAuthenticated}) => {
+const ConfirmCodeWindow = ({onSubmitURL, setCurrentPage, prevPageFlow, setOTP, userData, setAuthenticated}) => {
     const [otp, setOtp] = useState(new Array(6).fill(""));
     const inputRefs = useRef([]);
     const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -43,7 +41,7 @@ const ConfirmCodeWindow = ({setCurrentPage, setOTP, userData, setAuthenticated})
 
     useEffect(() => {
         if (readyToSubmit) {
-            fetch(REGISTER_URL, {
+            fetch(onSubmitURL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -86,8 +84,8 @@ const ConfirmCodeWindow = ({setCurrentPage, setOTP, userData, setAuthenticated})
 
     };
 
-    const backToQrScan = () => {
-        setCurrentPage(RegisterFlow.SECRET);
+    const back = () => {
+        setCurrentPage(prevPageFlow);
     };
 
     return (
@@ -137,7 +135,7 @@ const ConfirmCodeWindow = ({setCurrentPage, setOTP, userData, setAuthenticated})
             </div>
             <div className="container text-end mt-3 mr-3 w-50">
                 <div className="row">
-                    <button type="button" onClick={backToQrScan}
+                    <button type="button" onClick={back}
                             className="btn btn-dark fs-4 rounded-4 py-3 col-5 ">Go back
                     </button>
                     <button type="button" onClick={submitHandler}

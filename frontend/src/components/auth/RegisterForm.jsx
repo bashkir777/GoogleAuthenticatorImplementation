@@ -1,12 +1,12 @@
 import React from 'react';
-import {RegisterFlow} from "../../tools/consts";
+import {AuthenticationFlow, RegisterFlow} from "../../tools/consts";
 
 const RegisterForm = ({
                           changeUsername,
                           changePassword,
                           changeFirstname,
                           changeLastname,
-                          setShowLoginForm,
+                          setAuthenticationPage,
                           setCurrentPage,
                           userData,
                           validateUserData,
@@ -15,7 +15,7 @@ const RegisterForm = ({
 
     const switchToLogin = (event) => {
         event.preventDefault();
-        setShowLoginForm(true);
+        setAuthenticationPage(AuthenticationFlow.LOGIN);
         cleanError();
     }
     const switchToInstallation = (event) => {
