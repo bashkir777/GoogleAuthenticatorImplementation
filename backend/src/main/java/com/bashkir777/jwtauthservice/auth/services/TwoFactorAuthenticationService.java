@@ -30,18 +30,8 @@ public class TwoFactorAuthenticationService {
         return new DefaultSecretGenerator().generate();
     }
 
-    public String generateQRCodeImageURI(String secret) {
-        QrData qrData = new QrData.Builder()
-                .label("Scan this code with Google Authenticator Mobile App").secret(secret)
-                .issuer(appName).algorithm(HashingAlgorithm.SHA1).digits(6).period(30).build();
-        QrGenerator generator = new ZxingPngQrGenerator();
-        byte[] imgData = new byte[0];
-        try {
-            imgData = generator.generate(qrData);
-        } catch (QrGenerationException e) {
-            log.error("Error while generating QR Code");
-        }
-        return Utils.getDataUriForImage(imgData, generator.getImageMimeType());
+    public String formatQRCodeImageURL(String secret, String username) {
+        return String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", appName, username, secret, appName);
     }
 
     public boolean isOTPValid(String secret, String code) throws UnknownHostException {

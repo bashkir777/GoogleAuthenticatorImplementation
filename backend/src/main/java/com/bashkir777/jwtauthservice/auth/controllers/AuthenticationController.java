@@ -56,10 +56,10 @@ public class AuthenticationController {
             throws InvalidCode, NoSuchUserException, TFAIsNotEnabled, UnknownHostException {
        return ResponseEntity.ok(authenticationService.verifyCode(verificationRequest));
     }
-    @GetMapping("/generate-qr")
-    public ResponseEntity<QRCode> generateQr() {
+    @GetMapping("/generate-secret-qr-url/{username}")
+    public ResponseEntity<QRCode> generateQr(@PathVariable String username) {
         String secret = twoFactorAuthenticationService.generateNewSecret();
-        QRCode qrCode = new QRCode(twoFactorAuthenticationService.generateQRCodeImageURI(secret));
+        QRCode qrCode = new QRCode(twoFactorAuthenticationService.formatQRCodeImageURL(secret, username));
         return ResponseEntity.ok(qrCode);
     }
 
