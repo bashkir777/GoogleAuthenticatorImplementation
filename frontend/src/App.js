@@ -10,7 +10,7 @@ function App() {
   //todo: add check if user has access or refresh token in local storage and if one of them still valid
 
   return (
-      authenticated ? <Main/> : <AuthenticationProvider setAuthenticated={setAuthenticated}/>
+      authenticated ? <Main setAuthenticated={setAuthenticated}/> : <AuthenticationProvider setAuthenticated={setAuthenticated}/>
   );
 }
 
