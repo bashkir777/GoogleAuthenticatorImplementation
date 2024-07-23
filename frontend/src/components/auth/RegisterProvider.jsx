@@ -17,7 +17,8 @@ const RegisterProvider = ({setAuthenticationPage, setAuthenticated}) => {
         firstname: '',
         lastname: '',
         secret: '',
-        otp: ''
+        otp: '',
+        tfaEnabled: ''
     });
     const validateString = (inputStr) => {
         if (!inputStr) return false;
@@ -97,6 +98,7 @@ const RegisterProvider = ({setAuthenticationPage, setAuthenticated}) => {
             }
         });
     }
+
     const setOTP = (newOTP) => {
         changeUserData((prevState) => {
             return {
@@ -106,6 +108,14 @@ const RegisterProvider = ({setAuthenticationPage, setAuthenticated}) => {
         });
     }
 
+    const setTfaEnabled = (newTfaEnabled) => {
+        changeUserData((prevState) => {
+            return {
+                ...prevState,
+                tfaEnabled: newTfaEnabled
+            }
+        });
+    }
     return (
         <>
             {error && <ErrorMessage message={errorMessage} onClose={cleanError}/>}
@@ -114,6 +124,8 @@ const RegisterProvider = ({setAuthenticationPage, setAuthenticated}) => {
                               changeFirstname={changeFirstname}
                               changeLastname={changeLastname}
                               validateUserData={validateUserData}
+                              setTfaEnabled={setTfaEnabled}
+                              setAuthenticated={setAuthenticated}
                               userData={userData}
                               setAuthenticationPage={setAuthenticationPage}
                               setCurrentPage={setCurrentPage}

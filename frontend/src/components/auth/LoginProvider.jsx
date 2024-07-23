@@ -42,7 +42,7 @@ const LoginProvider = ({setAuthenticationPage, setAuthenticated}) => {
     return (
         <>
             {currentPage === LoginFlow.LOGIN &&
-                <LoginForm userData={userData} setUsername={setUsername} setPassword={setPassword}
+                <LoginForm userData={userData} setAuthenticated={setAuthenticated} setUsername={setUsername} setPassword={setPassword}
                            setAuthenticationPage={setAuthenticationPage} setCurrentPage={setCurrentPage}/>}
             {currentPage === LoginFlow.CONFIRMATION_CODE &&
                 <ConfirmCodeWindow setOTP={setOTP} userData={userData} setAuthenticated={setAuthenticated} onSubmitURL={VERIFICATION_URL}

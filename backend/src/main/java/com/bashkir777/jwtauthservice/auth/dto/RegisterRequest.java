@@ -14,4 +14,5 @@ public class RegisterRequest {
     private String lastname;
     private String secret;
     private String otp;
+    private Boolean tfaEnabled;
 }

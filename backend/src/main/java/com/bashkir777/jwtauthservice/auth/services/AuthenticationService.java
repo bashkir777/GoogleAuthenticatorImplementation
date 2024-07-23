@@ -68,7 +68,9 @@ public class AuthenticationService {
 
     public RegisterResponse register(RegisterRequest registerRequest)
             throws DataIntegrityViolationException, InvalidCode, UnknownHostException {
-        if (!tfaService.isOTPValid(registerRequest.getSecret(), registerRequest.getOtp())) {
+
+        if (registerRequest.getTfaEnabled()
+                && !tfaService.isOTPValid(registerRequest.getSecret(), registerRequest.getOtp())) {
             throw new InvalidCode();
         }
         var user = User.builder().firstName(registerRequest.getFirstname())
@@ -76,7 +78,7 @@ public class AuthenticationService {
                 .username(registerRequest.getUsername())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .secretKey(registerRequest.getSecret())
-                .twoFactorAuthenticationEnabled(true)
+                .twoFactorAuthenticationEnabled(registerRequest.getTfaEnabled())
                 .role(Role.USER).build();
         userRepository.save(user);
         var tokenPair = generateTokenPair(user);

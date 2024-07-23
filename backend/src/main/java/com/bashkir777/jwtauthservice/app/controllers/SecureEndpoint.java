@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/secure")
 public class SecureEndpoint {
-    @GetMapping("/echo/{string}")
-    public String secureEndpointExample(@PathVariable String string){
-        return string;
+    @GetMapping("/echo")
+    public String secureEndpointExample(){
+        return "This information received from secured endpoint";
     }
 }

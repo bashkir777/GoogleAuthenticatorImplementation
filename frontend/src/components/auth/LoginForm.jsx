@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {AuthenticationFlow, LoginFlow} from "../../tools/consts";
-import {TFA_ENABLES_URL} from "../../tools/urls";
+import {LOGIN_URL, TFA_ENABLES_URL} from "../../tools/urls";
 import ErrorMessage from "../../tools/ErrorMessage";
 
-const LoginForm = ({setAuthenticationPage, userData, setUsername, setPassword, setCurrentPage}) => {
+const LoginForm = ({setAuthenticationPage, setAuthenticated, userData, setUsername, setPassword, setCurrentPage}) => {
     const switchToRegister = (event) => {
         event.preventDefault();
         setAuthenticationPage(AuthenticationFlow.REGISTER);
@@ -37,6 +37,27 @@ const LoginForm = ({setAuthenticationPage, userData, setUsername, setPassword, s
             } else {
                 console.log("");
                 //todo: request to logic endpoint
+                fetch(LOGIN_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        username: userData.username,
+                        password: userData.password
+                    }),
+                    headers:
+                        {
+                            "Content-Type": "application/json"
+                        }
+                }).then(response => {
+                    if (!response.ok) {
+                        console.log("Неверный пароль или логин");
+                        throw new Error("Неверный пароль или логин");
+                    }
+                    return response.json();
+                }).then(data => {
+                    localStorage.setItem("tokens", JSON.stringify(data));
+                    setAuthenticated(true);
+                    console.log(data);
+                }).catch(err => console.log(err));
             }
 
         }
