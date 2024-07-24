@@ -40,6 +40,18 @@ dependencies {
 	implementation 'commons-net:commons-net:3.9.0'
 }
 
+tasks.named('jar') {
+    archiveBaseName.set('JWTSecureTFA')
+    archiveVersion.set('1.0.0')
+    archiveClassifier.set('')
+}
+
+tasks.named('bootJar') {
+    archiveBaseName.set('JWTSecureTFA')
+    archiveVersion.set('1.0.0')
+    archiveClassifier.set('')
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }

@@ -18,7 +18,7 @@ const RegisterProvider = ({setAuthenticationPage, setAuthenticated}) => {
         lastname: '',
         secret: '',
         otp: '',
-        tfaEnabled: ''
+        tfaEnabled: true
     });
     const validateString = (inputStr) => {
         if (!inputStr) return false;
