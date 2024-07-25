@@ -7,9 +7,14 @@ export const RegisterFlow = {
 
 export const LoginFlow = {
     LOGIN: 'login',
-    CONFIRMATION_CODE: 'confirmation-code'
+    CONFIRMATION_CODE: 'confirmation-code',
+    CHANGE_PASSWORD: 'change-password'
 }
 export const AuthenticationFlow = {
     REGISTER: 'register',
     LOGIN: 'login'
+}
+export const ChangePasswordFlow = {
+    ENTER_USERNAME: 'enter-username',
+    CHANGE_PASSWORD: 'change-password'
 }

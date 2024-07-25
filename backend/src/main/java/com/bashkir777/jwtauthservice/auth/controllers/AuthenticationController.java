@@ -52,10 +52,10 @@ public class AuthenticationController {
 
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody RefreshTokenDTO refreshTokenDTO)
+    public ResponseEntity<Success> logout(@RequestBody RefreshTokenDTO refreshTokenDTO)
             throws InvalidTokenException, DataIntegrityViolationException {
         authenticationService.logout(refreshTokenDTO);
-        return ResponseEntity.status(HttpStatus.OK).body("You have successfully logged out of the system");
+        return ResponseEntity.status(HttpStatus.OK).body(new Success(true, "you have successfully logged out"));
     }
 
     @GetMapping("/generate-secret-qr-url/{username}")
@@ -63,6 +63,13 @@ public class AuthenticationController {
         String secret = twoFactorAuthenticationService.generateNewSecret();
         QRCode qrCode = new QRCode(twoFactorAuthenticationService.formatQRCodeImageURL(secret, username));
         return ResponseEntity.ok(qrCode);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<AuthenticationResponse> resetPassword(@RequestBody ResetPassword resetPassword)
+            throws InvalidCode, BadCredentialsException {
+        ;
+        return ResponseEntity.status(HttpStatus.OK).body(authenticationService.resetPassword(resetPassword));
     }
 
     @ExceptionHandler({DataIntegrityViolationException.class, NoSuchUserException.class})

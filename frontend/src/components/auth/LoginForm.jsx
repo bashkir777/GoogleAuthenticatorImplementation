@@ -30,6 +30,11 @@ const LoginForm = ({setAuthenticationPage, setAuthenticated, userData, setUserna
             console.log("Invalid username or password")
         }
     }
+    const switchToChangePassword = (event) => {
+        event.preventDefault();
+        setCurrentPage(LoginFlow.CHANGE_PASSWORD);
+    };
+
     useEffect(() => {
         if (tfaEnabled !== null) {
             if (tfaEnabled) {
@@ -70,7 +75,8 @@ const LoginForm = ({setAuthenticationPage, setAuthenticated, userData, setUserna
                                                    className="form-control form-control-lg"/>
                                             <label className="form-label" htmlFor="typePasswordX">Password</label>
                                         </div>
-                                        <p className="small mb-5 pb-lg-2"><a className="text-white-50" href="#!">Forgot
+                                        <p className="mb-5 pb-lg-2"><a href=""
+                                                                             onClick={switchToChangePassword} className="text-white-50">Forgot
                                             password?</a></p>
                                         <button data-mdb-button-init data-mdb-ripple-init
                                                 className="btn btn-outline-light btn-lg px-5" onClick={submitHandler}

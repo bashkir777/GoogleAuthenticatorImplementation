@@ -1,5 +1,6 @@
 package com.bashkir777.jwtauthservice.auth.services;
 
+import com.bashkir777.jwtauthservice.app.data.exceptions.NoSuchUserException;
 import com.bashkir777.jwtauthservice.auth.dto.*;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidCode;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
@@ -99,7 +100,7 @@ public class AuthenticationService {
             throw new BadCredentialsException("Invalid password");
         }
         if (user.isTwoFactorAuthenticationEnabled()) {
-            if(!tfaService.isOTPValid(user.getSecretKey(), authenticationRequest.getOtp())){
+            if (!tfaService.isOTPValid(user.getSecretKey(), authenticationRequest.getOtp())) {
                 throw new InvalidCode();
             }
         }
@@ -108,6 +109,28 @@ public class AuthenticationService {
         tokenRepository.save(RefreshToken.builder()
                 .token(authenticationResponse.getRefreshToken()).user(user).build());
         return authenticationResponse;
+    }
+
+    public AuthenticationResponse resetPassword(@NonNull ResetPassword resetPassword) throws InvalidCode, BadCredentialsException {
+        var user = userRepository
+                .getUserByUsername(resetPassword.getUsername());
+        if (user == null) {
+            throw new BadCredentialsException("No such user");
+        }
+        if (user.isTwoFactorAuthenticationEnabled()) {
+            if (!tfaService.isOTPValid(user.getSecretKey(), resetPassword.getOtp())) {
+                throw new InvalidCode();
+            }
+            userRepository.resetPassword(user.getUsername()
+                    , passwordEncoder.encode(resetPassword.getNewPassword()));
+            AuthenticationResponse authenticationResponse;
+            authenticationResponse = generateTokenPair(user);
+            tokenRepository.save(RefreshToken.builder()
+                    .token(authenticationResponse.getRefreshToken()).user(user).build());
+            return authenticationResponse;
+        } else {
+            throw new BadCredentialsException("User hasn't enabled TFA. Password can't be changed");
+        }
     }
 
     private User checkIfTokenIsValidAndRefreshTypeAndReturnUser(RefreshTokenDTO refreshTokenDTO) throws InvalidTokenException {
