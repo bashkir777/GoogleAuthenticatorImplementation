@@ -8,3 +8,4 @@ export const REGISTER_URL = AUTH_URL + "/register";
 export const REFRESH_URL = AUTH_URL + "/refresh";
 export const RESET_PASSWORD_URL = AUTH_URL + "/reset-password";
 export const TFA_ENABLES_URL = AUTH_URL + "/tfa-enabled/";
+export const IS_USERNAME_FREE = AUTH_URL + "/is-username-free/";

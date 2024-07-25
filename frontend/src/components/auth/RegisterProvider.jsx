@@ -98,6 +98,14 @@ const RegisterProvider = ({setAuthenticationPage, setAuthenticated}) => {
             }
         });
     }
+    const setUsername = (newUsername) => {
+        changeUserData((prevState) => {
+            return {
+                ...prevState,
+                username: newUsername,
+            }
+        });
+    }
 
     const setOTP = (newOTP) => {
         changeUserData((prevState) => {
@@ -126,6 +134,7 @@ const RegisterProvider = ({setAuthenticationPage, setAuthenticated}) => {
                               validateUserData={validateUserData}
                               setTfaEnabled={setTfaEnabled}
                               setAuthenticated={setAuthenticated}
+                              setUsername={setUsername}
                               userData={userData}
                               setAuthenticationPage={setAuthenticationPage}
                               setCurrentPage={setCurrentPage}
@@ -136,7 +145,7 @@ const RegisterProvider = ({setAuthenticationPage, setAuthenticated}) => {
             {currentPage === RegisterFlow.SECRET &&
                 <SecretKeyQrCode setSecret={setSecret} userData={userData} setCurrentPage={setCurrentPage}/>}
             {currentPage === RegisterFlow.CONFIRMATION_CODE &&
-                <ConfirmCodeWindow onSubmitURL={REGISTER_URL} userData={userData} prevPageFlow={RegisterFlow.SECRET}
+                <ConfirmCodeWindow setGlobalError={setError} setGlobalErrorMessage={setErrorMessage} onSubmitURL={REGISTER_URL} userData={userData} prevPageFlow={RegisterFlow.REGISTER}
                                    setAuthenticated={setAuthenticated} setOTP={setOTP}
                                    setCurrentPage={setCurrentPage}/>}
 

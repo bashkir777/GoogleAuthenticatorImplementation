@@ -65,10 +65,14 @@ public class AuthenticationController {
         return ResponseEntity.ok(qrCode);
     }
 
+    @GetMapping("/is-username-free/{username}")
+    public ResponseEntity<IsFree> isUsernameFree(@PathVariable String username) {
+        return ResponseEntity.ok(authenticationService.isFree(username));
+    }
+
     @PostMapping("/reset-password")
     public ResponseEntity<AuthenticationResponse> resetPassword(@RequestBody ResetPassword resetPassword)
             throws InvalidCode, BadCredentialsException {
-        ;
         return ResponseEntity.status(HttpStatus.OK).body(authenticationService.resetPassword(resetPassword));
     }
 

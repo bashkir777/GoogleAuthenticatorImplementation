@@ -169,4 +169,10 @@ public class AuthenticationService {
                 .accessToken(jwtAccess).build();
     }
 
+    public IsFree isFree(String username){
+        var user = userRepository
+                .getUserByUsername(username);
+        return new IsFree(user == null);
+    }
+
 }

@@ -3,12 +3,14 @@ import {LoginFlow} from "../../tools/consts";
 import LoginForm from "./LoginForm";
 import ConfirmCodeWindow from "./ConfirmCodeWindow";
 import {LOGIN_URL} from "../../tools/urls";
-import ChangePasswordForm from "./ChangePasswordForm";
 import ChangePasswordProvider from "./ChangePasswordProvider";
+import ErrorMessage from "../../tools/ErrorMessage";
 
 const LoginProvider = ({setAuthenticationPage, setAuthenticated}) => {
     const [currentPage, setCurrentPage] = useState(LoginFlow.LOGIN);
     const [onSubmitURL, setSubmitURL] = useState(LOGIN_URL);
+    const [loginError, setLoginError] = useState(false);
+    const [loginErrorMessage, setLoginErrorMessage] = useState('');
     const [userData, setUserData] = React.useState({
         username: '',
         password: '',
@@ -44,6 +46,7 @@ const LoginProvider = ({setAuthenticationPage, setAuthenticated}) => {
 
     return (
         <>
+            {loginError && <ErrorMessage message={loginErrorMessage} onClose={()=>{setLoginError(false)}}/>}
             {currentPage === LoginFlow.LOGIN &&
                 <LoginForm userData={userData} setAuthenticated={setAuthenticated} setUsername={setUsername}
                            setPassword={setPassword}
@@ -52,7 +55,7 @@ const LoginProvider = ({setAuthenticationPage, setAuthenticated}) => {
                 <ChangePasswordProvider setUserData={setUserData} userData={userData} setCurrentPage={setCurrentPage}
                                         setUsername={setUsername} setPassword={setPassword} setSubmitURL={setSubmitURL}/>}
             {currentPage === LoginFlow.CONFIRMATION_CODE &&
-                <ConfirmCodeWindow setOTP={setOTP} userData={userData} setAuthenticated={setAuthenticated}
+                <ConfirmCodeWindow setGlobalError={setLoginError} setGlobalErrorMessage={setLoginErrorMessage} setOTP={setOTP} userData={userData} setAuthenticated={setAuthenticated}
                                    onSubmitURL={onSubmitURL}
                                    setCurrentPage={setCurrentPage} prevPageFlow={LoginFlow.LOGIN}/>}
         </>

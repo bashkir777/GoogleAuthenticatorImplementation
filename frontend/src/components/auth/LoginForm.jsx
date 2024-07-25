@@ -27,7 +27,7 @@ const LoginForm = ({setAuthenticationPage, setAuthenticated, userData, setUserna
                 setTfaEnabled(data.tfaEnabled);
             }).catch(err => console.log(err));
         } else {
-            console.log("Invalid username or password")
+            setError(true);
         }
     }
     const switchToChangePassword = (event) => {

@@ -2,12 +2,23 @@ import React, {useState, useRef, useEffect} from 'react';
 import ErrorMessage from "../../tools/ErrorMessage";
 import {postUserData} from "../../tools/utils";
 
-const ConfirmCodeWindow = ({onSubmitURL, setCurrentPage, prevPageFlow, setOTP, userData, setAuthenticated}) => {
+const ConfirmCodeWindow = ({
+                               setGlobalError,
+                               setGlobalErrorMessage,
+                               onSubmitURL,
+                               setCurrentPage,
+                               prevPageFlow,
+                               setOTP,
+                               userData,
+                               setAuthenticated
+                           }) => {
     const [otp, setOtp] = useState(new Array(6).fill(""));
     const inputRefs = useRef([]);
     const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    const [error, setError] = useState(false);
     const [readyToSubmit, setReadyToSubmit] = useState(false);
+    const [error, setError] = useState(false);
+    const [message, setErrorMessage] = useState('');
+
     useEffect(() => {
         if (inputRefs.current[0]) {
             inputRefs.current[0].focus();
@@ -36,6 +47,7 @@ const ConfirmCodeWindow = ({onSubmitURL, setCurrentPage, prevPageFlow, setOTP, u
             setOTP(otpToString());
             setReadyToSubmit(true);
         } else {
+            setErrorMessage("The confirmation code must be exactly 6 digits long. Please enter a valid code.");
             setError(true);
         }
     };
@@ -45,10 +57,15 @@ const ConfirmCodeWindow = ({onSubmitURL, setCurrentPage, prevPageFlow, setOTP, u
             postUserData(onSubmitURL, userData).then(data => {
                 setAuthenticated(true);
                 localStorage.setItem("tokens", JSON.stringify(data));
-            }).catch(err => console.log(err))
+            }).catch(err => {
+                console.log(err);
+                setGlobalErrorMessage("Invalid username, password or confirmation code. Please try again.");
+                setGlobalError(true);
+                setCurrentPage(prevPageFlow);
+            })
                 .finally(() => setReadyToSubmit(false))
         }
-    }, [readyToSubmit, userData, onSubmitURL, setAuthenticated]);
+    }, [readyToSubmit, userData, onSubmitURL, setAuthenticated, setCurrentPage, prevPageFlow, setGlobalErrorMessage, setGlobalError]);
 
     const handleKeyDown = (element, index, event) => {
         if (event.key in digits) {
@@ -79,62 +96,62 @@ const ConfirmCodeWindow = ({onSubmitURL, setCurrentPage, prevPageFlow, setOTP, u
     };
 
     return (
-        <div className="container pt-5">
-            {error && <ErrorMessage
-                message={"The confirmation code must be exactly 6 digits long. Please enter a valid code."}
-                onClose={() => setError(false)}/>}
-            <div
-                className="container w-50 p-3 text-center bg-light rounded-top-5 h2 mb-0 mt-5">
-                <div className="row row-cols-5 rounded-3 mt-5 ms-2">
-                    <div className="col col-8 text-center d-flex justify-content-center align-items-center pe-0">
-                        Enter 6 digits code from Google Authenticator
-                    </div>
-                    <div className="col col-3 me-3 text-center">
-                        <img
-                            width="100px"
-                            height="100px"
-                            src="/images/google-authenticator-logo.svg"
-                            className="border bg-light border-1 border-dark-subtle rounded-5"
-                            alt="GA logo"
-                        />
-                    </div>
-                </div>
-            </div>
-            <div className="container-sm p-3 py-5 text-center bg-light rounded-bottom-5 h2 w-50 h-100">
-                <div className="row rounded-3 ms-2">
-                    <div className="col-10 text-center offset-1">
-                        <div className="form-group d-flex justify-content-center">
-                            {otp.map((data, index) => (
-                                <input
-                                    className="otp-input form-control mx-1 text-center fs-2"
-                                    type="text"
-                                    name="otp"
-                                    maxLength="1"
-                                    key={index}
-                                    value={data}
-                                    onChange={() => {
-                                    }}
-                                    onKeyDown={e => handleKeyDown(e.target, index, e)}
-                                    onFocus={e => e.target.select()}
-                                    ref={el => inputRefs.current[index] = el}
-                                />
-                            ))}
+        <>
+            {error && <ErrorMessage message={message} onClose={() => setError(false)}/>}
+            <div className="container pt-5">
+                <div
+                    className="container w-50 p-3 text-center bg-light rounded-top-5 h2 mb-0 mt-5">
+                    <div className="row row-cols-5 rounded-3 mt-5 ms-2">
+                        <div className="col col-8 text-center d-flex justify-content-center align-items-center pe-0">
+                            Enter 6 digits code from Google Authenticator
+                        </div>
+                        <div className="col col-3 me-3 text-center">
+                            <img
+                                width="100px"
+                                height="100px"
+                                src="/images/google-authenticator-logo.svg"
+                                className="border bg-light border-1 border-dark-subtle rounded-5"
+                                alt="GA logo"
+                            />
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="container text-end mt-3 mr-3 w-50">
-                <div className="row">
-                    <button type="button" onClick={back}
-                            className="btn btn-dark fs-4 rounded-4 py-3 col-5 ">Go back
-                    </button>
-                    <button type="button" onClick={submitHandler}
-                            className="btn btn-dark fs-4 rounded-4 py-3 col-5 offset-2">Submit
-                    </button>
+                <div className="container-sm p-3 py-5 text-center bg-light rounded-bottom-5 h2 w-50 h-100">
+                    <div className="row rounded-3 ms-2">
+                        <div className="col-10 text-center offset-1">
+                            <div className="form-group d-flex justify-content-center">
+                                {otp.map((data, index) => (
+                                    <input
+                                        className="otp-input form-control mx-1 text-center fs-2"
+                                        type="text"
+                                        name="otp"
+                                        maxLength="1"
+                                        key={index}
+                                        value={data}
+                                        onChange={() => {
+                                        }}
+                                        onKeyDown={e => handleKeyDown(e.target, index, e)}
+                                        onFocus={e => e.target.select()}
+                                        ref={el => inputRefs.current[index] = el}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="container text-end mt-3 mr-3 w-50">
+                    <div className="row">
+                        <button type="button" onClick={back}
+                                className="btn btn-dark fs-4 rounded-4 py-3 col-5 ">Go back
+                        </button>
+                        <button type="button" onClick={submitHandler}
+                                className="btn btn-dark fs-4 rounded-4 py-3 col-5 offset-2">Submit
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+            );
+        </>)
 };
 
 export default ConfirmCodeWindow;
