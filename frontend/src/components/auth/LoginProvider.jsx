@@ -2,7 +2,7 @@ import React from 'react';
 import {LoginFlow} from "../../tools/consts";
 import LoginForm from "./LoginForm";
 import ConfirmCodeWindow from "./ConfirmCodeWindow";
-import {VERIFICATION_URL} from "../../tools/urls";
+import {LOGIN_URL} from "../../tools/urls";
 
 const LoginProvider = ({setAuthenticationPage, setAuthenticated}) => {
     const [currentPage, setCurrentPage] = React.useState(LoginFlow.LOGIN);
@@ -45,7 +45,7 @@ const LoginProvider = ({setAuthenticationPage, setAuthenticated}) => {
                 <LoginForm userData={userData} setAuthenticated={setAuthenticated} setUsername={setUsername} setPassword={setPassword}
                            setAuthenticationPage={setAuthenticationPage} setCurrentPage={setCurrentPage}/>}
             {currentPage === LoginFlow.CONFIRMATION_CODE &&
-                <ConfirmCodeWindow setOTP={setOTP} userData={userData} setAuthenticated={setAuthenticated} onSubmitURL={VERIFICATION_URL}
+                <ConfirmCodeWindow setOTP={setOTP} userData={userData} setAuthenticated={setAuthenticated} onSubmitURL={LOGIN_URL}
                                    setCurrentPage={setCurrentPage} prevPageFlow={LoginFlow.LOGIN}/>}
         </>
     );

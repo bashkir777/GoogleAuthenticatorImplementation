@@ -68,3 +68,19 @@ export async function refreshToken() {
         return false;
     }
 }
+
+export async function postUserData(onSubmitURL, userData) {
+    const response = await fetch(onSubmitURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData)
+    });
+    if (!response.ok) {
+        return response.text().then(errorBody => {
+            throw new Error(JSON.stringify(errorBody));
+        });
+    }
+    return await response.json();
+}

@@ -29,7 +29,7 @@ public class TwoFactorAuthenticationService {
         return String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", appName, username, secret, appName);
     }
 
-    public boolean isOTPValid(String secret, String code) throws UnknownHostException {
+    public boolean isOTPValid(String secret, String code) {
         CodeGenerator codeGenerator = new DefaultCodeGenerator();
         CodeVerifier codeVerifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
         return codeVerifier.isValidCode(secret, code);

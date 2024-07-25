@@ -2,9 +2,9 @@ spring:
   application:
     name: JWTAuthService
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    username: ${SPRING_DATASOURCE_USERNAME}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/jwtauthserver}
+    password: ${SPRING_DATASOURCE_PASSWORD:THsF*3858}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

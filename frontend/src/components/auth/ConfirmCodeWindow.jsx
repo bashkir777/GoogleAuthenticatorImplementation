@@ -1,5 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react';
 import ErrorMessage from "../../tools/ErrorMessage";
+import {postUserData} from "../../tools/utils";
 
 const ConfirmCodeWindow = ({onSubmitURL, setCurrentPage, prevPageFlow, setOTP, userData, setAuthenticated}) => {
     const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -41,24 +42,13 @@ const ConfirmCodeWindow = ({onSubmitURL, setCurrentPage, prevPageFlow, setOTP, u
 
     useEffect(() => {
         if (readyToSubmit) {
-            fetch(onSubmitURL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(userData)
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error("Authorization/Authentication Error");
-                }
-                return response.json();
-            }).then(data => {
+            postUserData(onSubmitURL, userData).then(data => {
                 setAuthenticated(true);
                 localStorage.setItem("tokens", JSON.stringify(data));
             }).catch(err => console.log(err))
-                .finally(() => setReadyToSubmit(false));
+                .finally(() => setReadyToSubmit(false))
         }
-    }, [readyToSubmit, userData]);
+    }, [readyToSubmit, userData, onSubmitURL, setAuthenticated]);
 
     const handleKeyDown = (element, index, event) => {
         if (event.key in digits) {

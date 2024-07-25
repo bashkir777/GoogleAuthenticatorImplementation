@@ -1,6 +1,7 @@
 import React from 'react';
 import {AuthenticationFlow, RegisterFlow} from "../../tools/consts";
 import {REGISTER_URL} from "../../tools/urls";
+import {postUserData} from "../../tools/utils";
 
 const RegisterForm = ({
                           changeUsername,
@@ -28,24 +29,11 @@ const RegisterForm = ({
                 setCurrentPage(RegisterFlow.INSTALLATION)
                 cleanError();
             }else{
-                fetch(REGISTER_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(userData),
-                    headers:{
-                        'Content-Type': 'application/json'
-                    }
-                }).then(response => {
-                    if (!response.ok) {
-                        return response.text().then(errorBody => {
-                            throw new Error(JSON.stringify(errorBody));
-                        });
-                    }
-                    return response.json();
-                }).then(data => {
+                postUserData(REGISTER_URL, userData).then(data => {
                     localStorage.setItem("tokens", JSON.stringify(data));
                     console.log(data);
                     setAuthenticated(true);
-                }).catch(err=>console.log(err));
+                }).catch(err => console.log(err));
             }
         }
     }

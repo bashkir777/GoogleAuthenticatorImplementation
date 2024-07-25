@@ -4,7 +4,6 @@ import com.bashkir777.jwtauthservice.app.data.exceptions.NoSuchUserException;
 import com.bashkir777.jwtauthservice.auth.dto.*;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidCode;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
-import com.bashkir777.jwtauthservice.auth.exceptions.TFAIsEnabled;
 import com.bashkir777.jwtauthservice.auth.exceptions.TFAIsNotEnabled;
 import com.bashkir777.jwtauthservice.auth.services.AuthenticationService;
 import com.bashkir777.jwtauthservice.auth.services.TwoFactorAuthenticationService;
@@ -35,7 +34,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest)
-            throws DataIntegrityViolationException, AuthenticationException, TFAIsEnabled {
+            throws DataIntegrityViolationException, AuthenticationException, InvalidCode {
         AuthenticationResponse authenticationResponse = authenticationService.login(authenticationRequest);
         return ResponseEntity.status(HttpStatus.OK).body(authenticationResponse);
     }
@@ -59,12 +58,6 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.OK).body("You have successfully logged out of the system");
     }
 
-    @PostMapping("/tfa-verification")
-    public ResponseEntity<AuthenticationResponse> verifyCode(@RequestBody TFAVerificationRequest TFAVerificationRequest)
-            throws InvalidCode, NoSuchUserException, TFAIsNotEnabled, UnknownHostException {
-        return ResponseEntity.ok(authenticationService.verifyCode(TFAVerificationRequest));
-    }
-
     @GetMapping("/generate-secret-qr-url/{username}")
     public ResponseEntity<QRCode> generateQr(@PathVariable String username) {
         String secret = twoFactorAuthenticationService.generateNewSecret();
@@ -82,7 +75,7 @@ public class AuthenticationController {
         return new ResponseEntity<>("Exception on our side", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler({InvalidTokenException.class, TFAIsEnabled.class, BadCredentialsException.class
+    @ExceptionHandler({InvalidTokenException.class, BadCredentialsException.class
             , InvalidCode.class, TFAIsNotEnabled.class})
     public ResponseEntity<String> handleIAuthExceptions(Exception ex) {
         return new ResponseEntity<>("Authentication/Authorization failed: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);

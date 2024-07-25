@@ -1,6 +1,5 @@
 package com.bashkir777.jwtauthservice.auth.services;
 
-import com.bashkir777.jwtauthservice.app.data.exceptions.NoSuchUserException;
 import com.bashkir777.jwtauthservice.auth.dto.*;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidCode;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
@@ -10,15 +9,12 @@ import com.bashkir777.jwtauthservice.app.data.repositories.UserRepository;
 import com.bashkir777.jwtauthservice.app.data.entities.User;
 import com.bashkir777.jwtauthservice.app.data.enums.Role;
 import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
-import com.bashkir777.jwtauthservice.auth.exceptions.TFAIsEnabled;
-import com.bashkir777.jwtauthservice.auth.exceptions.TFAIsNotEnabled;
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -93,21 +89,22 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse login(@NonNull AuthenticationRequest authenticationRequest)
-            throws DataIntegrityViolationException, AuthenticationException, TFAIsEnabled, BadCredentialsException {
+            throws DataIntegrityViolationException, AuthenticationException, InvalidCode {
         var user = userRepository
                 .getUserByUsername(authenticationRequest.getUsername());
         if (user == null) {
             throw new BadCredentialsException("No such user");
         }
-        if (user.isTwoFactorAuthenticationEnabled()) {
-            throw new TFAIsEnabled("tfa is enabled, you should use /tfa-verification endpoint instead of /login");
+        if (!passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Invalid password");
         }
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authenticationRequest.getUsername(), authenticationRequest.getPassword()
-        ));
+        if (user.isTwoFactorAuthenticationEnabled()) {
+            if(!tfaService.isOTPValid(user.getSecretKey(), authenticationRequest.getOtp())){
+                throw new InvalidCode();
+            }
+        }
         AuthenticationResponse authenticationResponse;
         authenticationResponse = generateTokenPair(user);
-        authenticationResponse.setTfaEnabled(false);
         tokenRepository.save(RefreshToken.builder()
                 .token(authenticationResponse.getRefreshToken()).user(user).build());
         return authenticationResponse;
@@ -148,27 +145,5 @@ public class AuthenticationService {
         return AccessToken.builder()
                 .accessToken(jwtAccess).build();
     }
-
-    public AuthenticationResponse verifyCode(@NonNull TFAVerificationRequest TFAVerificationRequest)
-            throws InvalidCode, TFAIsNotEnabled, NoSuchUserException, UnknownHostException, BadCredentialsException {
-        var user = userRepository.getUserByUsername(TFAVerificationRequest.getUsername());
-        if (user == null) {
-            throw new BadCredentialsException("There is no user with username " + TFAVerificationRequest.getUsername());
-        }
-        if (!passwordEncoder.matches(TFAVerificationRequest.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Invalid password");
-        }
-        if (!user.isTwoFactorAuthenticationEnabled()) {
-            throw new TFAIsNotEnabled();
-        }
-        var secret = user.getSecretKey();
-        boolean codeIsValid = tfaService.isOTPValid(secret, TFAVerificationRequest.getOtp());
-        if (codeIsValid) {
-            return generateTokenPair(user);
-        } else {
-            throw new InvalidCode();
-        }
-    }
-
 
 }

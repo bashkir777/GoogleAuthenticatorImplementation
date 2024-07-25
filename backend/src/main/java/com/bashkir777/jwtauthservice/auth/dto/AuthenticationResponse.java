@@ -12,5 +12,4 @@ import lombok.Data;
 public class AuthenticationResponse {
     private String refreshToken;
     private String accessToken;
-    private Boolean tfaEnabled;
 }
