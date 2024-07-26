@@ -15,7 +15,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -26,7 +25,11 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAccessAuthenticationFilter jwtAccessAuthenticationFilter;
     private CorsConfigurationSource configurationSource;
-    public static final List<String> openUris = List.of("/api/v1/auth/**");
+    public static final List<String> openUris = List.of("/api/v1/auth/**"
+            , "/swagger-ui/**", "/swagger-ui.html", "/webjars/**"
+            , "/configuration/security", "/configuration/ui"
+            , "/swagger/resources", "/swagger/resources/**"
+            , "/v3/**", "/v2/api-docs");
 
     @Autowired
     @Qualifier("allowAll")

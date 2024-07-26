@@ -57,7 +57,7 @@ public class JwtAccessAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("BEARER ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             // Access token is absent or not in the correct format
             // go user+password authentication
             filterChain.doFilter(request, response);

@@ -1,4 +1,4 @@
-FROM gradle:8.4-focal as build
+FROM gradle:8.4-focal AS build
 
 WORKDIR /workspace
 

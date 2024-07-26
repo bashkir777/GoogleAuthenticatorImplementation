@@ -63,7 +63,7 @@ public class AuthenticationService {
         return user.isTwoFactorAuthenticationEnabled();
     }
 
-    public RegisterResponse register(RegisterRequest registerRequest)
+    public AuthenticationResponse register(RegisterRequest registerRequest)
             throws DataIntegrityViolationException, InvalidCode, UnknownHostException {
 
         if (registerRequest.getTfaEnabled()
@@ -79,18 +79,18 @@ public class AuthenticationService {
                 .role(Role.USER).build();
         userRepository.save(user);
         var tokenPair = generateTokenPair(user);
-        var registerResponse = RegisterResponse.builder()
+        var authenticationResponse = AuthenticationResponse.builder()
                 .accessToken(tokenPair.getAccessToken())
                 .refreshToken(tokenPair.getRefreshToken())
                 .build();
         tokenRepository.save(RefreshToken.builder()
-                .token(registerResponse.getRefreshToken())
+                .token(authenticationResponse.getRefreshToken())
                 .user(user).build());
-        return registerResponse;
+        return authenticationResponse;
     }
 
     public AuthenticationResponse login(@NonNull AuthenticationRequest authenticationRequest)
-            throws DataIntegrityViolationException, AuthenticationException, InvalidCode {
+            throws BadCredentialsException, InvalidCode {
         var user = userRepository
                 .getUserByUsername(authenticationRequest.getUsername());
         if (user == null) {
