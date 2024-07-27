@@ -1,9 +1,6 @@
 package com.bashkir777.jwtauthservice.integration;
 
-import com.bashkir777.jwtauthservice.auth.dto.AuthenticationRequest;
-import com.bashkir777.jwtauthservice.auth.dto.AuthenticationResponse;
-import com.bashkir777.jwtauthservice.auth.dto.QRCode;
-import com.bashkir777.jwtauthservice.auth.dto.RegisterRequest;
+import com.bashkir777.jwtauthservice.auth.dto.*;
 import com.bashkir777.jwtauthservice.auth.services.TwoFactorAuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -56,6 +53,44 @@ public class AuthenticationControllerIT {
         doReturn(USERNAME).when(userDetails).getUsername();
         doReturn(PASSWORD).when(userDetails).getPassword();
     }
+    @Test
+    @DisplayName("Get username is free return true if username is free")
+    public void getUsernameIsFree_UsernameIsFree_ReturnsTrue() throws Exception{
+        MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders.get("/api/v1/auth/is-username-free/" + USERNAME))
+                .andExpect(status().isOk())
+                .andReturn();
+        String responseBody = mvcResult.getResponse().getContentAsString();
+        IsFree[] isFree = new IsFree[1];
+        assertThatCode(
+                () -> isFree[0] = objectMapper.readValue(responseBody, IsFree.class)
+        ).doesNotThrowAnyException();
+        assertThat(isFree[0].getIsFree()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Get TFA is enable returns true if user has enabled TFA")
+    @SqlGroup(
+            {
+                    @Sql(scripts = "/sql/createUserTFAEnabled.sql"
+                            , executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+                    @Sql(scripts = "/sql/truncateUsers.sql"
+                            ,executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+            }
+    )
+    public void getTFAIsEnable_UserHasTFAEnabled_ReturnsTrue() throws Exception{
+        MvcResult mvcResult = mockMvc
+                .perform(MockMvcRequestBuilders.get("/api/v1/auth/tfa-enabled/" + USERNAME))
+                .andExpect(status().isOk())
+                .andReturn();
+        String responseBody = mvcResult.getResponse().getContentAsString();
+        TFAEnabled[] tfaEnabled = new TFAEnabled[1];
+        assertThatCode(
+                () -> tfaEnabled[0] = objectMapper.readValue(responseBody, TFAEnabled.class)
+        ).doesNotThrowAnyException();
+        assertThat(tfaEnabled[0].isTfaEnabled()).isTrue();
+    }
+
 
     @Test
     @DisplayName("Login valid info and TFA enabled returns tokens")
