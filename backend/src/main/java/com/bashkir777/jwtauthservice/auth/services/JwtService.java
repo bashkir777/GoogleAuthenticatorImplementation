@@ -1,7 +1,6 @@
 package com.bashkir777.jwtauthservice.auth.services;
 
 import com.bashkir777.jwtauthservice.app.data.enums.TokenType;
-import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -58,8 +57,6 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-
-
     public String generateToken(UserDetails userDetails, TokenType type, @Nullable Map<String, Object> extraClaims) {
         if(extraClaims == null) extraClaims = new HashMap<>();
         extraClaims.put("type", type.name());
@@ -72,8 +69,4 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isExpired(String token) {
-        Date expiration = extractClaim(token, Claims::getExpiration);
-        return expiration.before(new Date());
-    }
 }

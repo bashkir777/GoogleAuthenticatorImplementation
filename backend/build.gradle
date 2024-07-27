@@ -39,6 +39,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'dev.samstevens.totp:totp:1.7.1'
 	implementation 'commons-net:commons-net:3.9.0'
+	testImplementation 'org.testcontainers:postgresql:1.17.6'
 }
 
 tasks.named('jar') {

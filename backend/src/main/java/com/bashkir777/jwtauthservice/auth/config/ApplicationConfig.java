@@ -1,11 +1,11 @@
 package com.bashkir777.jwtauthservice.auth.config;
 
 import com.bashkir777.jwtauthservice.app.data.repositories.UserRepository;
+import dev.samstevens.totp.time.NtpTimeProvider;
+import dev.samstevens.totp.time.TimeProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -19,10 +19,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.Arrays;
+import java.net.UnknownHostException;
 
 @Configuration
 @EnableTransactionManagement
@@ -58,7 +57,7 @@ public class ApplicationConfig implements WebMvcConfigurer {
         return configuration.getAuthenticationManager();
     }
     @Bean(name = "allowAll")
-    CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("*");
         configuration.addAllowedHeader("*");
@@ -66,5 +65,9 @@ public class ApplicationConfig implements WebMvcConfigurer {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+    @Bean
+    public TimeProvider timeProvider() throws UnknownHostException {
+        return new NtpTimeProvider("pool.ntp.org");
     }
 }

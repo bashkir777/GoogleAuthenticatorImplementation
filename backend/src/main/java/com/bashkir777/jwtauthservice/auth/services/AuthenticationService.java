@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,7 +47,7 @@ public class AuthenticationService {
         return (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    private AuthenticationResponse generateTokenPair(User user) {
+    public AuthenticationResponse generateTokenPair(UserDetails user) {
         var accessToken = jwtService.generateToken(user, TokenType.ACCESS, null);
         var refreshToken = jwtService.generateToken(user, TokenType.REFRESH, null);
         return AuthenticationResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
@@ -70,8 +69,8 @@ public class AuthenticationService {
                 && !tfaService.isOTPValid(registerRequest.getSecret(), registerRequest.getOtp())) {
             throw new InvalidCode();
         }
-        var user = User.builder().firstName(registerRequest.getFirstname())
-                .lastName(registerRequest.getLastname())
+        var user = User.builder().firstname(registerRequest.getFirstname())
+                .lastname(registerRequest.getLastname())
                 .username(registerRequest.getUsername())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .secretKey(registerRequest.getSecret())

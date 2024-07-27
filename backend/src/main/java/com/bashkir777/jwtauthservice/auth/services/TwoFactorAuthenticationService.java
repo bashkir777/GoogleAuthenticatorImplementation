@@ -1,24 +1,24 @@
 package com.bashkir777.jwtauthservice.auth.services;
 
 import dev.samstevens.totp.code.*;
+import dev.samstevens.totp.exceptions.CodeGenerationException;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
-import dev.samstevens.totp.time.NtpTimeProvider;
 import dev.samstevens.totp.time.TimeProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.net.UnknownHostException;
-
 @Service
 public class TwoFactorAuthenticationService {
-    private static final Logger log = LoggerFactory.getLogger(TwoFactorAuthenticationService.class);
-    private final TimeProvider timeProvider = new NtpTimeProvider("pool.ntp.org");
+    private final TimeProvider timeProvider;
+    private final CodeGenerator codeGenerator;
     @Value(value = "${spring.application.name}")
     private String appName;
 
-    public TwoFactorAuthenticationService() throws UnknownHostException {
+    @Autowired
+    public TwoFactorAuthenticationService(TimeProvider timeProvider) {
+        this.timeProvider = timeProvider;
+        this.codeGenerator = new DefaultCodeGenerator();
     }
 
     public String generateNewSecret() {
@@ -30,9 +30,12 @@ public class TwoFactorAuthenticationService {
     }
 
     public boolean isOTPValid(String secret, String code) {
-        CodeGenerator codeGenerator = new DefaultCodeGenerator();
         CodeVerifier codeVerifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
         return codeVerifier.isValidCode(secret, code);
+    }
+
+    public String generateCurrentOtpForSecretKey(String secretKey) throws CodeGenerationException {
+        return codeGenerator.generate(secretKey, timeProvider.getTime() / 30);
     }
 
 }
