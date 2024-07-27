@@ -53,6 +53,13 @@ public class AuthenticationControllerIT {
         doReturn(USERNAME).when(userDetails).getUsername();
         doReturn(PASSWORD).when(userDetails).getPassword();
     }
+
+//    @Test@DisplayName()
+//    public void resetPassword_CorrectlyResetsPassword(){
+//
+//    }
+
+
     @Test
     @DisplayName("Get username is free return true if username is free")
     public void getUsernameIsFree_UsernameIsFree_ReturnsTrue() throws Exception{

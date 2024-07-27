@@ -17,4 +17,6 @@ WORKDIR /app
 
 COPY --from=build /workspace/build/libs/JWTSecureTFA-1.0.0.jar ./application.jar
 
+EXPOSE 8080
+
 ENTRYPOINT ["java", "-jar", "application.jar"]

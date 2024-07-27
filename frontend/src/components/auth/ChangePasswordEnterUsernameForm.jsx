@@ -42,7 +42,9 @@ const ChangePasswordEnterUsernameForm = ({setCurrentPage, userData, setUsername,
                                         <h2 className="fw-bold mb-2 text-uppercase">enter your username</h2>
                                         <p className="text-white-50 mb-5">Warning! Password change requires enabled TFA</p>
                                         <div data-mdb-input-init className="form-outline form-white mb-4">
-                                            <input type="text" defaultValue={userData.username}
+                                            <input type="text" onChange={(event) =>
+                                                setUsername(event.target.value)
+                                            } defaultValue={userData.username}
                                                    id="typeUsername"
                                                    className="form-control form-control-lg"/>
                                             <label className="form-label" htmlFor="typeUsername">Username</label>
