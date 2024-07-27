@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
@@ -28,7 +27,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.regex.Pattern;
 
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -37,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthenticationControllerIT {
     @Value("${spring.application.name}")
     private String appName;
-    private UserDetails userDetails;
     private MockMvc mockMvc;
     private final static String USERNAME = "username";
     private final static String PASSWORD = "password";
@@ -78,6 +75,41 @@ public class AuthenticationControllerIT {
         this.userRepository = userRepository;
     }
 
+    @Test
+    @DisplayName("Refresh token correctly creates refresh token endpoint if refresh token is valid")
+    @SqlGroup(
+            {
+                    @Sql(scripts = "/sql/createUserTFAEnabled.sql"
+                            , executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+                    @Sql(scripts = "/sql/truncateUsers.sql"
+                            ,executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+            }
+    )
+    public void refreshTokenEndpoint_RefreshTokenIsValid_CorrectlyCreatesRefreshToken() throws Exception{
+        User user = userRepository.getUserByUsername(USERNAME);
+        RefreshToken refreshToken = RefreshToken.builder()
+                .user(user)
+                .token(jwtService.generateToken(user, TokenType.REFRESH, null))
+                .build();
+        tokenRepository.save(refreshToken);
+        tokenRepository.flush();
+
+        var requestBody = RefreshTokenDTO.builder()
+                .refreshToken(refreshToken.getToken()).build();
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isOk()).andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        AccessToken[] accessToken = new AccessToken[1];
+        assertThatCode(()->accessToken[0] = objectMapper.readValue(response, AccessToken.class))
+                .doesNotThrowAnyException();
+        assertThatCode( () ->
+                jwtService.extractAllClaimsAndValidateToken(accessToken[0].getAccessToken()))
+                .doesNotThrowAnyException();
+    }
 
     @Test
     @DisplayName("Logout correctly removes refresh token from whitelist")
@@ -140,8 +172,10 @@ public class AuthenticationControllerIT {
                 () -> authResponse[0]
                         = objectMapper.readValue(answerBody, AuthenticationResponse.class))
                 .doesNotThrowAnyException();
-        assertThat(authResponse[0].getAccessToken()).isNotEmpty().isNotNull();
-        assertThat(authResponse[0].getRefreshToken()).isNotEmpty().isNotNull();
+        assertThatCode(()->jwtService.extractAllClaimsAndValidateToken(authResponse[0].getAccessToken()))
+                .doesNotThrowAnyException();
+        assertThatCode(()->jwtService.extractAllClaimsAndValidateToken(authResponse[0].getRefreshToken()))
+                .doesNotThrowAnyException();
         String passwordInDB = userRepository.getUserByUsername(USERNAME).getPassword();
         assertThat(passwordEncoder.matches(NEW_PASSWORD, passwordInDB)).isTrue();
     }
@@ -212,8 +246,10 @@ public class AuthenticationControllerIT {
                 () -> authResponse[0]
                         = objectMapper.readValue(answerBody, AuthenticationResponse.class))
                 .doesNotThrowAnyException();
-        assertThat(authResponse[0].getAccessToken()).isNotEmpty().isNotNull();
-        assertThat(authResponse[0].getRefreshToken()).isNotEmpty().isNotNull();
+        assertThatCode(()->jwtService.extractAllClaimsAndValidateToken(authResponse[0].getAccessToken()))
+                .doesNotThrowAnyException();
+        assertThatCode(()->jwtService.extractAllClaimsAndValidateToken(authResponse[0].getRefreshToken()))
+                .doesNotThrowAnyException();
     }
 
 
@@ -242,8 +278,10 @@ public class AuthenticationControllerIT {
         assertThatCode(
                 () -> authResponse[0] = objectMapper.readValue(responseJson, AuthenticationResponse.class)
         ).doesNotThrowAnyException();
-        assertThat(authResponse[0].getAccessToken()).isNotEmpty().isNotNull();
-        assertThat(authResponse[0].getRefreshToken()).isNotEmpty().isNotNull();
+        assertThatCode(()->jwtService.extractAllClaimsAndValidateToken(authResponse[0].getAccessToken()))
+                .doesNotThrowAnyException();
+        assertThatCode(()->jwtService.extractAllClaimsAndValidateToken(authResponse[0].getRefreshToken()))
+                .doesNotThrowAnyException();
     }
 
 

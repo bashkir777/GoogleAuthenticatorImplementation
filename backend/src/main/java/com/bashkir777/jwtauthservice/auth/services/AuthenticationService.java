@@ -1,6 +1,5 @@
 package com.bashkir777.jwtauthservice.auth.services;
 
-import com.bashkir777.jwtauthservice.app.data.exceptions.NoSuchUserException;
 import com.bashkir777.jwtauthservice.auth.dto.*;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidCode;
 import com.bashkir777.jwtauthservice.auth.exceptions.InvalidTokenException;
@@ -159,7 +158,7 @@ public class AuthenticationService {
         User user = checkIfTokenIsValidAndRefreshTypeAndReturnUser(refreshTokenDTO);
         var refreshTokenDb = tokenRepository.findRefreshTokenByUser(user);
         if (refreshTokenDb.isEmpty() ||
-                refreshTokenDb.get().getToken().equals(refreshTokenDTO.getRefreshToken())) {
+                !refreshTokenDb.get().getToken().equals(refreshTokenDTO.getRefreshToken())) {
             throw new InvalidTokenException();
         }
         var jwtAccess = jwtService.
