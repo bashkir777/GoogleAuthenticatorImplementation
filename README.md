@@ -32,7 +32,7 @@ __Deployment__
 ## Deployment
 ### Clone repository
 ```bash
-git clone .../GoogleAuthenticatorImplementation 
+git clone https://github.com/bashkir777/GoogleAuthenticatorImplementation.git 
 ```
 ### Go to root folder
 ```bash
