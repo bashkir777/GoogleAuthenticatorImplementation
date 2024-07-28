@@ -47,28 +47,32 @@ __Application will be available at http://localhost:80__
 
 ## Screenshots
 
-__Login page__
+### Login page
+
 ![Login page](https://drive.google.com/uc?id=1E-mW0VY2TIeuUoadRIcjLtMe1qtXHJAL)
 
-__Registration page__
+### Registration page
+
 ![Registration page](https://drive.google.com/uc?id=1PwUNmk4VVafWEKrKvbsOXyPMYWca6E9a)
 
-__Google Authenticator Installation page__
+### Google Authenticator Installation page
+
 ![Google Authenticator Installation page](https://drive.google.com/uc?id=1RGilPRI1gNHEeJQXAJ_VwXLYTA2SsSUV)
 
-__Secret QR scan page__
+### Secret QR scan page
+
 ![Secret QR scan page](https://drive.google.com/uc?id=1CIh2W0vrbMXOlZGrgMmiwENc8l_-O__U)
 
-__One time password page__
+### One time password page
 
-![One time password page](https://drive.google.com/file/d/14uU5rRwhKO3p4ixIdbM2s64IrgPVDf3P/view?usp=drive_link)
+![One time password page](https://drive.google.com/uc?id=14uU5rRwhKO3p4ixIdbM2s64IrgPVDf3P)
 
-__Forgot password flow__
+### Forgot password flow
 
-![Enter username](https://drive.google.com/uc?id=1pW4NO_7oE1Z2pAoMEcocgtTO8Dckqhh)
+![Enter username](https://drive.google.com/uc?id=1pW4NO_7oE1Z2pAoMEcocgtTO8Dckqhh_)
 
 ![Enter new password](https://drive.google.com/uc?id=1ksDNEFcxo4j5yoSaE9_yKkt8cArYkSqZ)
 
-__Swagger documentation__ 
+### Swagger documentation
 
 ![Swagger documentation](https://drive.google.com/uc?id=1QmaD_KbsXlE0rd44itZQdlbcKIXp95gx)
